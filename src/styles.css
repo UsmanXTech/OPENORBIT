@@ -67,7 +67,7 @@ h3{font-size:15px;margin:0 0 3px}
 .nums strong{display:block;margin-top:4px;font-size:15px}
 .tokenbottom{display:flex;gap:8px;margin-top:14px}
 .tokenbottom .btn{flex:1;padding:9px 8px;font-size:11px}
-.empty{display:none;border:1px dashed var(--border);border-radius:14px;padding:24px;text-align:center;color:var(--muted)}
+.empty{display:block;border:1px dashed var(--border);border-radius:14px;padding:24px;text-align:center;color:var(--muted)}
 .launch{margin:76px 0;padding:30px;border:1px solid #314567;border-radius:22px;background:radial-gradient(ellipse at 80% 0,#263c66aa,transparent 55%),#0d1525;display:flex;align-items:center;justify-content:space-between;gap:26px}
 .launch p{max-width:650px}
 .pillrow{display:flex;gap:7px;flex-wrap:wrap}
