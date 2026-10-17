@@ -59,8 +59,8 @@ export default function App(){
   const submit=(event:FormEvent<HTMLFormElement>)=>{
     event.preventDefault();
     const name=draft.name.trim(),symbol=draft.symbol.trim().toUpperCase(),supply=Number(draft.supply),description=draft.description.trim();
-    if(!name||!/^[A-Z0-9]{1,10}$/.test(symbol)||!Number.isSafeInteger(supply)||supply<1){
-      setDraftError("Enter a name, a 1–10 character alphanumeric symbol, and a positive whole-number supply.");setResult(null);return;
+    if(!name||!/^[A-Z0-9]{1,10}$/.test(symbol)||!Number.isSafeInteger(supply)||supply<1||supply>1_000_000_000_000_000){
+      setDraftError("Enter a name, a 1–10 character alphanumeric symbol, and a whole-number supply between 1 and 1,000,000,000,000,000.");setResult(null);return;
     }
     setDraftError("");setResult({name,symbol,supply,description});
   };
