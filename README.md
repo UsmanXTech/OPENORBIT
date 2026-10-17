@@ -1,48 +1,44 @@
 # OPENORBIT
 
-OPENORBIT is a testnet-first, non-custodial on-chain token launchpad and community marketplace concept.
+OPENORBIT is a testnet-first, non-custodial token launchpad and community marketplace concept.
 
 ## Current status
 
-This repository currently contains an interactive, static frontend preview in `index.html`. It is suitable for a first Vercel preview deployment as a static website. It is **not** a complete production marketplace.
+The frontend has been migrated from a single-file HTML prototype to a React + TypeScript + Vite application. It remains a demo-only preview, not a production marketplace.
 
-### Included in this preview
+### Included
 
-- Responsive landing and marketplace experience
-- Asset listing search, category tabs, and sorting
-- Asset detail dialog
-- Wallet connection UI state (not connected to wallet providers)
-- Token launch draft form with basic client-side validation
-- Explicit demo-data and disabled-transaction messaging
+- Responsive marketplace layout and sample asset cards
+- Search, category filters, and sorting
+- Asset details, wallet-preview, and launch-draft dialogs
+- Keyboard Escape handling, focus cycling, focus restoration, and visible focus states
+- Client-side validation for launch-draft fields
+- Unit tests for core preview interactions
+- GitHub Actions workflow for type-checking, tests, and production builds
 
-### Not implemented yet
+### Not implemented
 
-- React/TypeScript/Vite application architecture
 - API server, persistent database, authentication, or user profiles
-- Real market data, indexer, price feeds, portfolio, or activity data
-- Wallet adapter, smart contracts, trading, or token deployment
+- Live market data, indexer, price feeds, portfolio, or activity data
+- Wallet provider integration, smart contracts, trading, or token deployment
 - Contract audit, production security review, and chain configuration
+- Dependency lockfile and a verified production build in this environment
 
-## Preview deployment
+## Local development
 
-For the current static preview, import this GitHub repository into Vercel and keep the project as a static site:
+Requires Node.js 22 or a compatible supported release and npm.
 
-- Framework preset: **Other**
-- Build command: leave blank
-- Output directory: `./`
-- Install command: leave blank
+1. Install dependencies with npm install.
+2. Start the dev server with npm run dev.
+3. Run checks with npm run typecheck and npm test.
+4. Create a production bundle with npm run build.
+5. Preview the bundle with npm run preview.
 
-The homepage is `index.html` at the repository root. After Vercel is connected to the repository, new commits to the production branch can trigger deployments automatically if the project settings enable Git integration.
+The GitHub Actions workflow runs type-checking, unit tests, and the production build on pushes to main and pull requests targeting main.
 
-## Local preview
+## Deployment
 
-The current page has no package dependencies. You can open `index.html` directly, or serve the repository directory with a local static server, for example:
-
-```bash
-python -m http.server 8000
-```
-
-Then open `http://localhost:8000`.
+The repository is structured for a Vite static build. For Vercel, use the Vite framework preset, the default build command (npm run build), and dist as the output directory. Deployment is intentionally left to the repository owner.
 
 ## Safety and production readiness
 
@@ -52,10 +48,4 @@ Then open `http://localhost:8000`.
 - Do not add private keys or secret values to the repository.
 - Do not enable live chain interactions until the target network, audited contract design, transaction flow, and operational controls have been reviewed and approved.
 
-## Next milestones
-
-1. Convert the static preview into the planned React + TypeScript + Vite project.
-2. Add linting, type checking, and automated UI tests.
-3. Decide the target testnet and contract/trading design.
-4. Implement an API and persistence layer with explicit authorization and validation.
-5. Integrate wallet and chain reads behind feature flags, then perform a security review before enabling writes.
+See PROGRESS.md for implementation and verification notes.
