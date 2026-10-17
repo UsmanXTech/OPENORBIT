@@ -24,3 +24,8 @@ Next milestones:
 2. Generate and commit a dependency lockfile after a successful clean install.
 3. Add linting and stronger component-level/accessibility tests.
 4. Define API/data contracts before connecting any backend or chain indexer.
+## 2026-10-18 — Launch supply validation hardening
+
+- Enforced the launch form's documented maximum supply in application logic, not only through HTML input attributes. The form uses `noValidate`, so browser constraints alone were insufficient.
+- Added a regression test for supplies above `1,000,000,000,000,000` and verified the error is exposed as an alert.
+- Validation is committed on `automation/local-improvements`; dependency installation and CI execution still need confirmation.
