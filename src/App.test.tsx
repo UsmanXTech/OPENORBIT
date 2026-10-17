@@ -33,6 +33,16 @@ describe("OPENORBIT marketplace preview",()=>{
   expect(screen.getByText("Draft ready for review")).toBeInTheDocument();
   expect(screen.getByText(/No contract has been generated or deployed/)).toBeInTheDocument();
  });
+ it("rejects a supply above the documented maximum",async()=>{
+  const user=userEvent.setup(); render(<App />);
+  await user.click(screen.getByRole("button",{name:"Create launch draft"}));
+  await user.type(screen.getByRole("textbox",{name:"Token name"}),"Open Orbit");
+  await user.type(screen.getByRole("textbox",{name:"Token symbol"}),"orbt");
+  await user.type(screen.getByRole("spinbutton",{name:"Total supply"}),"1000000000000001");
+  await user.click(screen.getByRole("button",{name:"Review draft"}));
+  expect(screen.getByRole("alert")).toHaveTextContent(/between 1 and 1,000,000,000,000,000/);
+  expect(screen.queryByText("Draft ready for review")).not.toBeInTheDocument();
+ });
  it("keeps wallet integration in preview mode",async()=>{
   const user=userEvent.setup(); render(<App />);
   await user.click(screen.getByRole("button",{name:"Connect wallet"}));
