@@ -29,3 +29,10 @@ Next milestones:
 - Enforced the launch form's documented maximum supply in application logic, not only through HTML input attributes. The form uses `noValidate`, so browser constraints alone were insufficient.
 - Added a regression test for supplies above `1,000,000,000,000,000` and verified the error is exposed as an alert.
 - Validation is committed on `automation/local-improvements`; dependency installation and CI execution still need confirmation.
+
+## 2026-10-18 — CI test selector correction
+
+- GitHub Actions run for `7b7978fe78cb2465d490952fd656332bfc3ab6bd`: TypeScript type-check passed; 2 of 6 UI tests failed because launch-draft tests queried a button name that omitted its visible arrow glyph.
+- Updated both selectors to match the rendered accessible name, `Create launch draft ↗`.
+- The production build was skipped after the failed test step. Re-run status is pending; do not treat tests or build as passing until CI confirms them.
+- Dependency installation reported 3 audit findings; review package-level details before selecting safe dependency updates.
