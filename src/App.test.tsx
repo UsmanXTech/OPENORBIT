@@ -25,7 +25,7 @@ describe("OPENORBIT marketplace preview",()=>{
  });
  it("reviews a launch draft without deploying it",async()=>{
   const user=userEvent.setup(); render(<App />);
-  await user.click(screen.getByRole("button",{name:"Create launch draft"}));
+  await user.click(screen.getByRole("button",{name:"Create launch draft ↗"}));
   await user.type(screen.getByRole("textbox",{name:"Token name"}),"Open Orbit");
   await user.type(screen.getByRole("textbox",{name:"Token symbol"}),"orbt");
   await user.type(screen.getByRole("spinbutton",{name:"Total supply"}),"1000000");
@@ -35,7 +35,7 @@ describe("OPENORBIT marketplace preview",()=>{
  });
  it("rejects a supply above the documented maximum",async()=>{
   const user=userEvent.setup(); render(<App />);
-  await user.click(screen.getByRole("button",{name:"Create launch draft"}));
+  await user.click(screen.getByRole("button",{name:"Create launch draft ↗"}));
   await user.type(screen.getByRole("textbox",{name:"Token name"}),"Open Orbit");
   await user.type(screen.getByRole("textbox",{name:"Token symbol"}),"orbt");
   await user.type(screen.getByRole("spinbutton",{name:"Total supply"}),"1000000000000001");
