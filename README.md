@@ -22,7 +22,7 @@ The frontend has been migrated from a single-file HTML prototype to a React + Ty
 - Live market data, indexer, price feeds, portfolio, or activity data
 - Wallet provider integration, smart contracts, trading, or token deployment
 - Contract audit, production security review, and chain configuration
-- Dependency lockfile and a verified production build in this environment
+- Dependency lockfile; local checks have not been run in the authoring environment (GitHub Actions verification is recorded in `PROGRESS.md`)
 
 ## Local development
 
@@ -34,7 +34,7 @@ Requires Node.js 22 or a compatible supported release and npm.
 4. Create a production bundle with npm run build.
 5. Preview the bundle with npm run preview.
 
-The GitHub Actions workflow runs type-checking, unit tests, and the production build on pushes to main and pull requests targeting main.
+The GitHub Actions workflow runs type-checking, unit tests, and the production build on pushes to main and pull requests targeting main. The current passing CI run is recorded in `PROGRESS.md`; a dependency lockfile is still outstanding.
 
 ## Deployment
 
