@@ -21,18 +21,6 @@ Use research and a concrete usability review before substantial UI changes. Trea
    https://github.com/nirholas/solana-launchpad-ui  
    Documents common launchpad information architecture: discovery tabs, token details, creation form, trade/activity views, and mobile breakpoints. This is a pattern reference only; OPENORBIT must not imply these live features exist.
 
-5. **Uniswap Explore — live app and official help guide**  
-   https://app.uniswap.org/explore  
-   https://support.uniswap.org/hc/en-us/articles/9818094509453-How-to-use-the-Uniswap-Explore-page  
-   Reviewed the live route and official usage guide. The documented interface separates token, pool, and transaction discovery and supports explicit filtering/sorting. The live app is client-rendered, so interaction details here are based on the official guide rather than a DOM inspection. Transferable lesson: show how many results match the current view without changing the stable catalog total; do not imply OPENORBIT has live analytics or trading.
-6. **Raydium LaunchLab — live create route and official flow guide**  
-   https://raydium.io/launchpad/create/  
-   https://github.com/raydium-io/raydium-docs-v1/blob/main/user-flows/creating-a-launchlab-token.mdx  
-   Reviewed the live route and official walkthrough. The guide contrasts a minimal launch path with an advanced configurable path and calls for reviewing launch parameters before signing. Transferable lesson: make configuration and review boundaries explicit. Do not copy live-wallet or transaction affordances into the OPENORBIT preview.
-7. **W3C — WCAG 2.2 Recommendation**  
-   https://www.w3.org/TR/WCAG22/  
-   Used as the baseline for focus visibility, understandable status messaging, form feedback, and operable controls. Color alone must not communicate connection state.
-
 ## Current-interface review
 
 Reviewed the React UI in `src/App.tsx`, styles in `src/styles.css`, sample data in `src/data/assets.ts`, and interaction tests in `src/App.test.tsx`.
@@ -57,21 +45,6 @@ Reviewed the React UI in `src/App.tsx`, styles in `src/styles.css`, sample data 
 | P1 | Accessibility coverage is currently based on a small set of interaction tests. | Keyboard, screen-reader naming, contrast, and responsive regressions can go unnoticed. | Add focused tests for empty search results, keyboard modal behavior, field-level errors, and preview-state wording; manually verify narrow viewport and keyboard-only flow when a browser is available. |
 | P2 | Visual styles are mostly compressed into dense CSS rules. | Future visual refinements may become inconsistent and harder to review. | Introduce a small, documented set of design tokens and reusable patterns when touching the stylesheet; avoid a risky full rewrite. |
 
-## 2026-10-19 — Example-led review and first implementation
-
-### Examples and decisions
-
-- **Uniswap Explore:** the official guide documents separate discovery surfaces and useful filters/sort criteria. OPENORBIT now keeps the catalog-wide “Listed assets” count stable and shows a separate “Showing X of Y sample assets” message for the current search/filter view. This avoids presenting a filtered count as a total.
-- **Raydium LaunchLab:** the official guide makes launch modes and irreversible settings explicit before the transaction approval step. OPENORBIT uses the pattern of clarity around state and review, not a live deployment CTA, because its launch form remains a local draft.
-- **WCAG 2.2:** the green status dot and “Testnet preview” label could be interpreted as a healthy live network. The header now says “Preview mode”; the status card separately identifies the wallet as disconnected and chain integration as not configured. A neutral blue marker replaces the green success cue for preview status.
-
-### Acceptance criteria for this change
-
-- Preview status cannot be mistaken for an active testnet connection from copy or success-colored decoration.
-- The catalog total remains stable while search results change.
-- Users can see the matching result count and clear search/category filters in one action.
-- Automated tests cover the stable total, count, reset behavior, and preview-state copy.
-
 ## Implementation sequence
 
 1. Clarify preview/network status semantics and keep status understandable without color.
@@ -89,3 +62,58 @@ Reviewed the React UI in `src/App.tsx`, styles in `src/styles.css`, sample data 
 - Keyboard focus, labels, errors, responsive behavior, and empty states are considered.
 - Relevant tests, type-check, and production build pass in CI; if unavailable or failing, the limitation is recorded truthfully.
 - The change is reviewed against the latest `main` before committing. Never deploy Vercel as part of this workflow.
+
+
+## 2026-10-20 — Premium visual redesign direction
+
+### Real product examples reviewed before implementation
+
+5. **Uniswap Explore — token discovery**  
+   https://app.uniswap.org/explore/tokens  
+   Observed patterns: clear product navigation, prominent search, distinct discovery categories, and structured tabular information for comparing assets. Transfer the clear information hierarchy and discovery-first controls; do not copy Uniswap branding, wallet flows, or imply that OPENORBIT has live prices, volume, or chain data.
+6. **Raydium LaunchLab — token creation flow**  
+   https://raydium.io/launchpad/create/  
+   Observed pattern: creation is a dedicated task with explicit configuration steps rather than a generic call-to-action. Transfer the separation between browsing and preparing a launch draft; do not imply that OPENORBIT can create a token or submit a transaction.
+7. **W3C WCAG 2.2**  
+   https://www.w3.org/TR/WCAG22/ and https://www.w3.org/WAI/WCAG22/Understanding/focus-visible.html  
+   Preserve visible focus, semantic labels, contrast, and clear feedback while refining the visual style.
+
+### Design decision
+
+The existing page relies on multiple large gradients, glowing decorative effects, dense rounded surfaces, and a dark blue palette that makes the interface feel more like a generic prototype than a finished product. The redesign uses a more disciplined editorial hierarchy, warm light workspace surfaces, ink-colored text, a single violet accent, consistent borders and radii, tighter data hierarchy, and a dark hero panel as a deliberate focal point. Existing responsive breakpoints, reduced-motion support, visible keyboard focus, and demo-only disclosures must remain intact.
+
+### Acceptance criteria
+
+- Establish a coherent design-token system and consistent surface, spacing, typography, button, input, card, and modal treatments.
+- Keep navigation and primary actions clear at desktop and mobile widths.
+- Use color and text together for state; never present a live connection or production network that is not configured.
+- Keep all sample metrics explicitly identified as illustrative and all wallet/deployment actions non-live.
+- Preserve keyboard focus, reduced-motion behavior, and readable form errors.
+- Run typecheck, tests, and production build; record actual outcomes and do not claim unrun checks passed.
+
+
+## 2026-10-20 — Accessible launch-draft validation
+
+### Real examples and guidance reviewed before implementation
+
+- **W3C WAI — Validating Input:** https://www.w3.org/WAI/tutorials/forms/validation/  
+  Explains required fields, custom validation, and the need to provide understandable feedback. Transfer: retain application-level validation because the form intentionally uses `noValidate`; do not rely only on browser attributes.
+- **W3C WAI — User Notifications:** https://www.w3.org/WAI/tutorials/forms/notifications/  
+  Recommends specific inline feedback, corrective instructions, programmatic association via `aria-describedby`, and moving focus to the first invalid control after submit. Transfer all four patterns; avoid a single generic message that forces users to guess which field is wrong.
+- **Raydium official LaunchLab creation guide:** https://github.com/raydium-io/raydium-docs-v1/blob/main/user-flows/creating-a-launchlab-token.mdx  
+  The documented flow asks creators to review parameters before approving an irreversible on-chain action. Transfer the explicit review boundary only. OPENORBIT remains a local draft and must not copy live signing, wallet, or deployment behavior.
+- **W3C WCAG 2.2:** https://www.w3.org/TR/WCAG22/  
+  Preserve visible keyboard focus, text-based error cues, and understandable status feedback. Error color is supplementary; each error remains readable text linked to its input.
+
+### Design decision
+
+The launch-draft form previously returned one generic error for three different validation failures. This adds field-level messages for token name, symbol, and total supply; marks invalid inputs with `aria-invalid`; links each message through `aria-describedby`; and moves focus to the first invalid field. Editing a field clears only that field's stale error. A concise alert summary remains for the overall submit failure.
+
+### Acceptance criteria
+
+- Empty submission identifies all required fields and focuses token name first.
+- Invalid symbol and out-of-range supply show actionable field-specific guidance.
+- Each invalid input exposes `aria-invalid="true"` and references its error text.
+- Correcting a field clears its inline error without clearing unrelated errors.
+- Valid input still produces only a local draft; no contract is generated, signed, or deployed.
+- CI type-check, tests, and production build must pass before promotion; browser-only keyboard and narrow viewport checks remain separately reported.

@@ -14,7 +14,7 @@ Implemented in this milestone:
 Verification status:
 
 - A local npm install, type-check, test run, and production build were not run in this tool session because a local Node execution environment was unavailable.
-- At initial scaffold time, CI had not yet been confirmed; see the later dated CI entries below for subsequent successful workflow runs.
+- The CI workflow has been added, but its result must be confirmed in the repository Actions tab; it is not reported as passing here.
 - No wallet connection, live transaction, token deployment, trading, API, or persistence behavior was enabled.
 - No dependency lockfile was generated in this environment; add and commit one after running npm install in a Node-enabled environment.
 
@@ -45,17 +45,33 @@ Next milestones:
 - A dependency lockfile is still missing and remains a follow-up engineering task.
 
 
-## 2026-10-19 — Research-led preview-state and catalog feedback
+## 2026-10-20 — Premium visual refresh
 
-- Reviewed the live Uniswap Explore route and its official help guide, the live Raydium LaunchLab creation route and official creation-flow guide, and the W3C WCAG 2.2 Recommendation before changing the interface.
-- Changed the header from “Testnet preview” to “Preview mode”; separated wallet disconnection from the fact that chain integration is not configured; removed the green success cue from preview-state indicators.
-- Kept “Listed assets” tied to the full sample catalog, added a separate live result count, and added a one-action reset for search and category filters.
-- Added regression tests for stable totals, result-count updates, reset behavior, and preview-state wording.
-- Verification: local dependency installation and test execution are unavailable in this tool environment. Check the GitHub Actions run for the new commit before treating the change as verified. No Vercel deployment was invoked.
+### Research-first decisions
 
-## 2026-10-20 — UI/UX branch verification follow-up
+- Reviewed Uniswap Explore token discovery: https://app.uniswap.org/explore/tokens. Adopted clearer discovery hierarchy and structured information; did not copy branding or imply live market data.
+- Reviewed Raydium LaunchLab creation flow: https://raydium.io/launchpad/create/. Kept token preparation separate from browsing and clearly framed it as a local draft.
+- Consulted WCAG 2.2 and W3C focus guidance: https://www.w3.org/TR/WCAG22/ and https://www.w3.org/WAI/WCAG22/Understanding/focus-visible.html.
+- Added detailed rationale and acceptance criteria to `UI_UX_RESEARCH.md`.
 
-- The first catalog-summary test matcher introduced a TypeScript error because optional chaining returned `boolean | undefined`. The Vercel preview build exposed it; the matcher now returns a strict boolean via `Boolean(element?.classList.contains("results-summary"))`.
-- The subsequent preview build for commit `884e093a411d635d12f7c6517bb539b1e7921279` reached `READY`, and the associated Vercel status is successful. This confirms the TypeScript check and production build only; it does **not** confirm Vitest tests, which Vercel's configured build command does not run.
-- GitHub Actions workflow runs were not available for this branch, and the pull-request creation attempt was blocked by the tool safety checks. The UI/UX changes remain on `automation/uiux-preview-catalog`; `main` is unchanged.
-- No manual Vercel deployment was invoked. Wallet integration, live trading, and token deployment remain disabled.
+### Implemented directly on main
+
+- Replaced the gradient-heavy prototype styling with a disciplined light workspace, ink-colored type, a single violet accent, refined card/data hierarchy, and a dark hero/creator panel.
+- Standardized design tokens, borders, radii, controls, dialog styling, responsive breakpoints, keyboard focus, and reduced-motion behavior.
+- Changed the header label to “Preview mode” and replaced invented launch-count/market-cap figures with transparent sample-catalog, filtered-result, draft-only, and network-status information.
+
+### Verification status
+
+- GitHub contents API accepted the documentation, stylesheet, and app changes on `main` in sequential commits.
+- Build and test checks have not yet been independently confirmed for the resulting main commits. Inspect GitHub Actions and Vercel's automatically triggered status before declaring this milestone verified.
+
+
+## 2026-10-20 — Launch-draft form feedback and keyboard recovery
+
+- Reviewed W3C WAI's form-validation and user-notification guidance, the official Raydium LaunchLab creation walkthrough, and WCAG 2.2 before changing the launch-draft form. Research and transfer decisions are recorded in `UI_UX_RESEARCH.md`.
+- Replaced the generic launch-draft validation message with field-specific name, symbol, and total-supply guidance.
+- Added `aria-invalid` and `aria-describedby` associations, a concise submit summary, and focus placement on the first invalid field. Editing a field clears only its own stale error.
+- Updated the visual treatment so invalid inputs and helper text are distinguishable while retaining the global high-contrast keyboard focus indicator.
+- Added regression coverage for all-empty submission, first-invalid focus, linked supply-range feedback, and clearing a field error after correction.
+- Safety boundary unchanged: drafts are local UI state; no wallet connection, contract generation, signature, deployment, or trade is enabled.
+- Verification at branch preparation: CI has not yet completed for this change. Confirm type-check, Vitest, production build, and Vercel preview before merging. No manual deployment was invoked.

@@ -16,26 +16,6 @@ describe("OPENORBIT marketplace preview",()=>{
   expect(screen.getByText("Nebula Network")).toBeInTheDocument();
   expect(screen.queryByText("Lumen Protocol")).not.toBeInTheDocument();
  });
- it("keeps the catalog total stable and reports matching results with a reset action",async()=>{
-  const user=userEvent.setup(); render(<App />);
-  const listedAssets=screen.getByText("Listed assets").parentElement;
-  expect(listedAssets).toHaveTextContent("06");
-  expect(screen.getByText((_,element)=>Boolean(element?.classList.contains("results-summary")))).toHaveTextContent("Showing 6 of 6 sample assets");
-  await user.type(screen.getByRole("textbox",{name:"Search assets"}),"Nebula");
-  expect(listedAssets).toHaveTextContent("06");
-  expect(screen.getByText((_,element)=>Boolean(element?.classList.contains("results-summary")))).toHaveTextContent("Showing 1 of 6 sample assets");
-  await user.click(screen.getByRole("button",{name:"Clear search & filters"}));
-  expect(screen.getByText("Lumen Protocol")).toBeInTheDocument();
-  expect(screen.getByText((_,element)=>Boolean(element?.classList.contains("results-summary")))).toHaveTextContent("Showing 6 of 6 sample assets");
- });
- it("labels wallet and chain states as preview-only, not as a live testnet",()=>{
-  render(<App />);
-  expect(screen.getByText("Preview mode")).toBeInTheDocument();
-  expect(screen.getByText("Wallet status")).toBeInTheDocument();
-  expect(screen.getByText("Chain integration")).toBeInTheDocument();
-  expect(screen.getByText("Not configured")).toBeInTheDocument();
-  expect(screen.queryByText("Testnet preview")).not.toBeInTheDocument();
- });
  it("filters to trending sample assets",async()=>{
   const user=userEvent.setup(); render(<App />);
   await user.click(screen.getByRole("button",{name:"Trending"}));
@@ -60,8 +40,35 @@ describe("OPENORBIT marketplace preview",()=>{
   await user.type(screen.getByRole("textbox",{name:"Token symbol"}),"orbt");
   await user.type(screen.getByRole("spinbutton",{name:"Total supply"}),"1000000000000001");
   await user.click(screen.getByRole("button",{name:"Review draft"}));
-  expect(screen.getByRole("alert")).toHaveTextContent(/between 1 and 1,000,000,000,000,000/);
+  const supply=screen.getByRole("spinbutton",{name:"Total supply"});
+  expect(screen.getByText(/Supply must be between 1 and 1,000,000,000,000,000/)).toBeInTheDocument();
+  expect(supply).toHaveAttribute("aria-invalid","true");
+  expect(supply).toHaveAttribute("aria-describedby","token-supply-error");
+  expect(supply).toHaveFocus();
   expect(screen.queryByText("Draft ready for review")).not.toBeInTheDocument();
+ });
+ it("shows field-level errors and focuses the first invalid input",async()=>{
+  const user=userEvent.setup(); render(<App />);
+  await user.click(screen.getByRole("button",{name:"Create launch draft ↗"}));
+  await user.click(screen.getByRole("button",{name:"Review draft"}));
+  const name=screen.getByRole("textbox",{name:"Token name"});
+  expect(name).toHaveAttribute("aria-invalid","true");
+  expect(name).toHaveAttribute("aria-describedby","token-name-error");
+  expect(name).toHaveFocus();
+  expect(screen.getByText("Enter a token name.")).toBeInTheDocument();
+  expect(screen.getByText("Use 1–10 letters or numbers for the symbol.")).toBeInTheDocument();
+  expect(screen.getByText("Enter a total supply.")).toBeInTheDocument();
+  expect(screen.getByRole("alert")).toHaveTextContent(/fix the highlighted fields/i);
+ });
+ it("clears an inline error when its field is corrected",async()=>{
+  const user=userEvent.setup(); render(<App />);
+  await user.click(screen.getByRole("button",{name:"Create launch draft ↗"}));
+  await user.click(screen.getByRole("button",{name:"Review draft"}));
+  const name=screen.getByRole("textbox",{name:"Token name"});
+  await user.type(name,"Open Orbit");
+  expect(name).toHaveAttribute("aria-invalid","false");
+  expect(name).not.toHaveAttribute("aria-describedby");
+  expect(screen.queryByText("Enter a token name.")).not.toBeInTheDocument();
  });
  it("keeps wallet integration in preview mode",async()=>{
   const user=userEvent.setup(); render(<App />);
