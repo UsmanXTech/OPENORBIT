@@ -48,6 +48,7 @@ export default function App(){
   const [result,setResult]=useState<LaunchDraft|null>(null);
   const [draft,setDraft]=useState({name:"",symbol:"",supply:"",description:""});
   const closeDialog=useCallback(()=>setDialog(null),[]);
+  const resetSearchAndFilters=useCallback(()=>{setQuery("");setFilter("all");},[]);
   const openLaunch=useCallback(()=>{setDraftError("");setResult(null);setDialog("launch");},[]);
   const visible=useMemo(()=>{
     const q=query.trim().toLocaleLowerCase();
@@ -56,6 +57,7 @@ export default function App(){
     if(sort==="cap") items.sort((a,b)=>b.marketCap-a.marketCap);
     return items;
   },[filter,query,sort]);
+  const hasActiveFilters=query.trim().length>0||filter!=="all";
   const submit=(event:FormEvent<HTMLFormElement>)=>{
     event.preventDefault();
     const name=draft.name.trim(),symbol=draft.symbol.trim().toUpperCase(),supply=Number(draft.supply),description=draft.description.trim();
@@ -92,16 +94,21 @@ export default function App(){
         <div className="sectionhead"><div><div className="eyebrow">Community marketplace</div><h2>Explore assets</h2><p>Browse sample listings to preview the discovery experience.</p></div>
           <div className="tabs" role="group" aria-label="Filter assets">{filters.map(f=><button key={f.value} className={"tab"+(filter===f.value?" active":"")} type="button" aria-pressed={filter===f.value} onClick={()=>setFilter(f.value)}>{f.label}</button>)}</div>
         </div>
-        <div className="filters"><input className="field" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Search by name or symbol…" aria-label="Search assets"/>
+        <div className="filters"><div className="search-control">
+          <svg className="search-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none"><circle cx="10.8" cy="10.8" r="6.8" stroke="currentColor" strokeWidth="1.8"/><path d="m16 16 4.2 4.2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/></svg>
+          <input className="field" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Search by name or symbol…" aria-label="Search assets"/>
+          {query&&<button className="clear-search" type="button" aria-label="Clear search" onClick={()=>setQuery("")}>×</button>}
+        </div>
           <select className="field" value={sort} onChange={e=>setSort(e.target.value as AssetSort)} aria-label="Sort assets"><option value="featured">Sort: Featured</option><option value="name">Name A–Z</option><option value="cap">Market cap</option></select>
         </div>
+        <div className="results-meta"><p className="results-count" aria-live="polite" aria-atomic="true">{visible.length===sampleAssets.length&&!hasActiveFilters?`Showing all ${sampleAssets.length} sample assets`:`Showing ${visible.length} of ${sampleAssets.length} sample assets`}</p>{hasActiveFilters&&visible.length>0&&<button className="reset-controls" type="button" onClick={resetSearchAndFilters}>Reset search and filters</button>}</div>
         {notice&&<div className="notice" role="status">{notice}</div>}
         <div className="token-grid">{visible.map(a=><article className="token" key={a.id}>
           <div className="token-top"><div className={"coin "+a.color} aria-hidden="true">{a.initial}</div><div><h3>{a.name}</h3><div className="symbol">{a.symbol} · {a.category}</div></div><span className="badge">{tagLabel(a.tag)}</span></div>
           <p className="desc">{a.description}</p><div className="nums"><div><label>Sample price</label><strong>{a.priceLabel}</strong></div><div><label>Sample market cap</label><strong>{a.marketCapLabel}</strong></div></div>
           <div className="tokenbottom"><button className="btn" type="button" onClick={()=>{setSelected(a);setDialog("asset");}}>View details</button><button className="btn ghost" type="button" onClick={()=>setNotice("Trading is disabled in this preview. Sample market data is for interface demonstration only.")}>Trade · Demo</button></div>
         </article>)}</div>
-        {visible.length===0&&<div className="empty" role="status">No assets match your search. Try a different name or symbol.</div>}
+        {visible.length===0&&<div className="empty"><div><strong>No matching assets</strong><p>Try a different name or symbol, or reset your search and filters.</p></div><button className="btn" type="button" onClick={resetSearchAndFilters}>Reset search and filters</button></div>}
       </section>
       <section className="launch" id="launch"><div><div className="eyebrow">Creator tools</div><h2>Build something worth discovering.</h2><p>Configure an initial token launch draft, review your project parameters, and prepare it for a future testnet integration. Drafts stay in this browser session.</p><div className="pillrow"><span className="pill">Parameter validation</span><span className="pill">Draft review</span><span className="pill">No live transactions</span></div></div><button className="btn primary" type="button" onClick={openLaunch}>Create launch draft ↗</button></section>
       <section id="how"><div className="sectionhead"><div><div className="eyebrow">Designed for clarity</div><h2>From idea to launch draft</h2><p>A safer workflow before chain and contract configuration are finalized.</p></div></div>
