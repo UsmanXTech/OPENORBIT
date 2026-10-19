@@ -64,3 +64,12 @@ Next milestones:
 
 - GitHub contents API accepted the documentation, stylesheet, and app changes on `main` in sequential commits.
 - Build and test checks have not yet been independently confirmed for the resulting main commits. Inspect GitHub Actions and Vercel's automatically triggered status before declaring this milestone verified.
+
+
+## 2026-10-20 — Search feedback and empty-state recovery
+
+- Reviewed the official Uniswap Explore help page for search/filter/sort patterns, Radix Themes color guidance for restrained accent and focus states, and WCAG 2.2 before changing discovery controls. Full rationale and acceptance criteria are recorded in `UI_UX_RESEARCH.md`.
+- Added a search icon and accessible clear-search control, explicit matching-count copy tied to the illustrative catalog, and a reset action for zero-result searches that clears both query and category.
+- Reworked the empty state into a responsive recovery panel with a named action; no live market or blockchain claims were introduced.
+- Added regression tests for result-count feedback, clearing a query, and resetting from a zero-result filtered state.
+- Verification for this commit: pending GitHub Actions run after promotion; do not treat this entry as verified until typecheck, tests, and production build are green.
