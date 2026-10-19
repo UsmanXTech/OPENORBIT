@@ -90,3 +90,35 @@ The existing page relies on multiple large gradients, glowing decorative effects
 - Keep all sample metrics explicitly identified as illustrative and all wallet/deployment actions non-live.
 - Preserve keyboard focus, reduced-motion behavior, and readable form errors.
 - Run typecheck, tests, and production build; record actual outcomes and do not claim unrun checks passed.
+
+
+## 2026-10-20 — Search feedback and empty-state recovery
+
+### Sources reviewed before this change
+
+1. **Uniswap Labs Support — How to use the Uniswap Explore page**  
+   https://support.uniswap.org/hc/en-us/articles/9818094509453-How-to-use-the-Uniswap-Explore-page  
+   Observed patterns: search by token name/symbol, visible filters, explicit sorting choices, and separate discovery categories. Transfer the clear search-and-filter workflow; do not transfer live price/volume assumptions or network-specific controls that OPENORBIT does not implement.
+2. **Radix Themes — Color system**  
+   https://www.radix-ui.com/themes/docs/theme/color  
+   Observed guidance: a restrained semantic accent scale and coordinated focus/selection treatments. Preserve the single violet accent and consistent visible keyboard focus rather than introducing more status colors or decorative gradients.
+3. **W3C — WCAG 2.2**  
+   https://www.w3.org/TR/WCAG22/  
+   Relevant guidance: visible focus, understandable labels, status feedback, target sizing, and predictable interactions.
+
+### Problem and acceptance criteria
+
+The discovery controls did not provide an explicit result count, an in-field clear action, or a direct recovery action when filters produced no cards. Users had to manually erase text and remember to reset the selected category.
+
+- Show the number of matching assets against the full **sample** catalog; never present it as a live-market count.
+- Provide an accessible, visible clear-search button when text is present.
+- Provide one reset action when a search/category combination yields no matches; reset both search and category.
+- Keep the empty state actionable, responsive, and keyboard reachable.
+- Add regression tests for count feedback, clear-search, and empty-state recovery.
+- Preserve sample-data disclosures, reduced-motion behavior, and existing keyboard focus styling.
+
+### What should and should not transfer
+
+- **Transfer:** visible discovery feedback, clear recovery paths, and consistent control states.
+- **Do not transfer:** token prices, rankings, live chain selectors, or analytics that require unavailable backend data.
+- **Accessibility:** name icon-only controls, retain visible focus, announce result-count changes politely, and keep reset actions reachable at narrow widths.
