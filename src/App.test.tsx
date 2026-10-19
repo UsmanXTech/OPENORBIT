@@ -16,6 +16,26 @@ describe("OPENORBIT marketplace preview",()=>{
   expect(screen.getByText("Nebula Network")).toBeInTheDocument();
   expect(screen.queryByText("Lumen Protocol")).not.toBeInTheDocument();
  });
+ it("keeps the catalog total stable and reports matching results with a reset action",async()=>{
+  const user=userEvent.setup(); render(<App />);
+  const listedAssets=screen.getByText("Listed assets").parentElement;
+  expect(listedAssets).toHaveTextContent("06");
+  expect(screen.getByText("Showing 6 of 6 sample assets")).toBeInTheDocument();
+  await user.type(screen.getByRole("textbox",{name:"Search assets"}),"Nebula");
+  expect(listedAssets).toHaveTextContent("06");
+  expect(screen.getByText("Showing 1 of 6 sample assets")).toBeInTheDocument();
+  await user.click(screen.getByRole("button",{name:"Clear search & filters"}));
+  expect(screen.getByText("Lumen Protocol")).toBeInTheDocument();
+  expect(screen.getByText("Showing 6 of 6 sample assets")).toBeInTheDocument();
+ });
+ it("labels wallet and chain states as preview-only, not as a live testnet",()=>{
+  render(<App />);
+  expect(screen.getByText("Preview mode")).toBeInTheDocument();
+  expect(screen.getByText("Wallet status")).toBeInTheDocument();
+  expect(screen.getByText("Chain integration")).toBeInTheDocument();
+  expect(screen.getByText("Not configured")).toBeInTheDocument();
+  expect(screen.queryByText("Testnet preview")).not.toBeInTheDocument();
+ });
  it("filters to trending sample assets",async()=>{
   const user=userEvent.setup(); render(<App />);
   await user.click(screen.getByRole("button",{name:"Trending"}));

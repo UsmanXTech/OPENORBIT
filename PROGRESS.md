@@ -14,7 +14,7 @@ Implemented in this milestone:
 Verification status:
 
 - A local npm install, type-check, test run, and production build were not run in this tool session because a local Node execution environment was unavailable.
-- The CI workflow has been added, but its result must be confirmed in the repository Actions tab; it is not reported as passing here.
+- At initial scaffold time, CI had not yet been confirmed; see the later dated CI entries below for subsequent successful workflow runs.
 - No wallet connection, live transaction, token deployment, trading, API, or persistence behavior was enabled.
 - No dependency lockfile was generated in this environment; add and commit one after running npm install in a Node-enabled environment.
 
@@ -43,3 +43,12 @@ Next milestones:
 - The passing run validates the React application source and supply-limit regression test. Documentation-only commits made afterward do not change application source; rerun CI on the final main commit after promotion.
 - `npm install` reported 3 audit findings. Package-level details remain to be reviewed before making dependency upgrades; no forced or potentially breaking audit fix was applied.
 - A dependency lockfile is still missing and remains a follow-up engineering task.
+
+
+## 2026-10-19 — Research-led preview-state and catalog feedback
+
+- Reviewed the live Uniswap Explore route and its official help guide, the live Raydium LaunchLab creation route and official creation-flow guide, and the W3C WCAG 2.2 Recommendation before changing the interface.
+- Changed the header from “Testnet preview” to “Preview mode”; separated wallet disconnection from the fact that chain integration is not configured; removed the green success cue from preview-state indicators.
+- Kept “Listed assets” tied to the full sample catalog, added a separate live result count, and added a one-action reset for search and category filters.
+- Added regression tests for stable totals, result-count updates, reset behavior, and preview-state wording.
+- Verification: local dependency installation and test execution are unavailable in this tool environment. Check the GitHub Actions run for the new commit before treating the change as verified. No Vercel deployment was invoked.

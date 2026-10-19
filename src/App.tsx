@@ -70,7 +70,7 @@ export default function App(){
     <header className="top"><div className="wrap nav">
       <a className="brand" href="#top" aria-label="OPENORBIT home"><span className="logo" aria-hidden="true">O</span><span>OPENORBIT</span></a>
       <nav className="navlinks" aria-label="Main navigation"><a className="active" href="#explore">Explore</a><a href="#launch">Launch a token</a><a href="#how">How it works</a></nav>
-      <div className="right"><span className="net"><span className="dot" aria-hidden="true"/>Testnet preview</span><button className="btn primary" type="button" onClick={()=>{setWalletNotice("No connection request will be sent.");setDialog("wallet");}}>Connect wallet</button></div>
+      <div className="right"><span className="net"><span className="dot preview" aria-hidden="true"/>Preview mode</span><button className="btn primary" type="button" onClick={()=>{setWalletNotice("No connection request will be sent.");setDialog("wallet");}}>Connect wallet</button></div>
     </div></header>
     <main id="top" className="wrap">
       <section className="hero"><div>
@@ -80,10 +80,10 @@ export default function App(){
         <div className="notice">Preview mode: market figures are sample data. Wallet and token deployment actions are not connected to a live blockchain.</div>
       </div><aside className="hero-card" aria-label="Preview status">
         <div className="eyebrow">A new constellation</div><div className="orbitart" aria-hidden="true"><div className="orb"><div className="core"/></div></div>
-        <div className="status"><span>Network status</span><span><span className="dot" aria-hidden="true"/>Not connected</span></div><div className="status status-last"><span>Deployment mode</span><strong>Read-only preview</strong></div>
+        <div className="status"><span>Wallet status</span><span><span className="dot preview" aria-hidden="true"/>Not connected</span></div><div className="status"><span>Chain integration</span><strong>Not configured</strong></div><div className="status status-last"><span>Deployment mode</span><strong>Read-only preview</strong></div>
       </aside></section>
       <section className="stats" aria-label="Marketplace overview">
-        <div className="stat"><label>Listed assets</label><strong>{String(visible.length).padStart(2,"0")}</strong><small>Sample listing data</small></div>
+        <div className="stat"><label>Listed assets</label><strong>{String(sampleAssets.length).padStart(2,"0")}</strong><small>Sample listing set</small></div>
         <div className="stat"><label>Launches this week</label><strong>24</strong><small>Illustrative metric</small></div>
         <div className="stat"><label>Total market cap</label><strong>$8.42M</strong><small>Demo only</small></div>
         <div className="stat"><label>Network</label><strong>Testnet</strong><small>Chain not configured</small></div>
@@ -95,13 +95,17 @@ export default function App(){
         <div className="filters"><input className="field" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Search by name or symbol…" aria-label="Search assets"/>
           <select className="field" value={sort} onChange={e=>setSort(e.target.value as AssetSort)} aria-label="Sort assets"><option value="featured">Sort: Featured</option><option value="name">Name A–Z</option><option value="cap">Market cap</option></select>
         </div>
+        <div className="catalog-meta">
+          <p className="results-summary" role="status" aria-live="polite">Showing <strong>{visible.length}</strong> of {sampleAssets.length} sample assets</p>
+          {(query.trim()!==""||filter!=="all")&&<button className="btn clear-filters" type="button" onClick={()=>{setQuery("");setFilter("all");setNotice("");}}>Clear search &amp; filters</button>}
+        </div>
         {notice&&<div className="notice" role="status">{notice}</div>}
         <div className="token-grid">{visible.map(a=><article className="token" key={a.id}>
           <div className="token-top"><div className={"coin "+a.color} aria-hidden="true">{a.initial}</div><div><h3>{a.name}</h3><div className="symbol">{a.symbol} · {a.category}</div></div><span className="badge">{tagLabel(a.tag)}</span></div>
           <p className="desc">{a.description}</p><div className="nums"><div><label>Sample price</label><strong>{a.priceLabel}</strong></div><div><label>Sample market cap</label><strong>{a.marketCapLabel}</strong></div></div>
           <div className="tokenbottom"><button className="btn" type="button" onClick={()=>{setSelected(a);setDialog("asset");}}>View details</button><button className="btn ghost" type="button" onClick={()=>setNotice("Trading is disabled in this preview. Sample market data is for interface demonstration only.")}>Trade · Demo</button></div>
         </article>)}</div>
-        {visible.length===0&&<div className="empty" role="status">No assets match your search. Try a different name or symbol.</div>}
+        {visible.length===0&&<div className="empty" role="status">No assets match your search. Try a different name or symbol, or clear your search and filters above.</div>}
       </section>
       <section className="launch" id="launch"><div><div className="eyebrow">Creator tools</div><h2>Build something worth discovering.</h2><p>Configure an initial token launch draft, review your project parameters, and prepare it for a future testnet integration. Drafts stay in this browser session.</p><div className="pillrow"><span className="pill">Parameter validation</span><span className="pill">Draft review</span><span className="pill">No live transactions</span></div></div><button className="btn primary" type="button" onClick={openLaunch}>Create launch draft ↗</button></section>
       <section id="how"><div className="sectionhead"><div><div className="eyebrow">Designed for clarity</div><h2>From idea to launch draft</h2><p>A safer workflow before chain and contract configuration are finalized.</p></div></div>
