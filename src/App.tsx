@@ -70,7 +70,7 @@ export default function App(){
     <header className="top"><div className="wrap nav">
       <a className="brand" href="#top" aria-label="OPENORBIT home"><span className="logo" aria-hidden="true">O</span><span>OPENORBIT</span></a>
       <nav className="navlinks" aria-label="Main navigation"><a className="active" href="#explore">Explore</a><a href="#launch">Launch a token</a><a href="#how">How it works</a></nav>
-      <div className="right"><span className="net"><span className="dot" aria-hidden="true"/>Testnet preview</span><button className="btn primary" type="button" onClick={()=>{setWalletNotice("No connection request will be sent.");setDialog("wallet");}}>Connect wallet</button></div>
+      <div className="right"><span className="net"><span className="dot" aria-hidden="true"/>Preview mode</span><button className="btn primary" type="button" onClick={()=>{setWalletNotice("No connection request will be sent.");setDialog("wallet");}}>Connect wallet</button></div>
     </div></header>
     <main id="top" className="wrap">
       <section className="hero"><div>
@@ -83,10 +83,10 @@ export default function App(){
         <div className="status"><span>Network status</span><span><span className="dot" aria-hidden="true"/>Not connected</span></div><div className="status status-last"><span>Deployment mode</span><strong>Read-only preview</strong></div>
       </aside></section>
       <section className="stats" aria-label="Marketplace overview">
-        <div className="stat"><label>Listed assets</label><strong>{String(visible.length).padStart(2,"0")}</strong><small>Sample listing data</small></div>
-        <div className="stat"><label>Launches this week</label><strong>24</strong><small>Illustrative metric</small></div>
-        <div className="stat"><label>Total market cap</label><strong>$8.42M</strong><small>Demo only</small></div>
-        <div className="stat"><label>Network</label><strong>Testnet</strong><small>Chain not configured</small></div>
+        <div className="stat"><label>Sample assets</label><strong>{String(sampleAssets.length).padStart(2,"0")}</strong><small>Illustrative catalog</small></div>
+        <div className="stat"><label>Matching results</label><strong>{String(visible.length).padStart(2,"0")}</strong><small>Current search and filters</small></div>
+        <div className="stat"><label>Launch status</label><strong>Draft only</strong><small>No contract generated</small></div>
+        <div className="stat"><label>Network</label><strong>Not connected</strong><small>No chain configured</small></div>
       </section>
       <section id="explore">
         <div className="sectionhead"><div><div className="eyebrow">Community marketplace</div><h2>Explore assets</h2><p>Browse sample listings to preview the discovery experience.</p></div>
