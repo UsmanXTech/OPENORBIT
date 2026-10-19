@@ -75,3 +75,13 @@ Next milestones:
 - Added regression coverage for all-empty submission, first-invalid focus, linked supply-range feedback, and clearing a field error after correction.
 - Safety boundary unchanged: drafts are local UI state; no wallet connection, contract generation, signature, deployment, or trade is enabled.
 - Verification at branch preparation: CI has not yet completed for this change. Confirm type-check, Vitest, production build, and Vercel preview before merging. No manual deployment was invoked.
+
+
+### Verification follow-up — 2026-10-20
+
+- The first pull-request workflow run (#19) caught three test failures because inline error copy was nested inside wrapping labels and became part of the fields' accessible names.
+- Moved field labels and inputs into separate, explicitly associated elements while retaining `aria-describedby` links to inline errors. Added a grid constraint to keep form controls within their columns.
+- Follow-up GitHub Actions run #20 passed dependency installation, TypeScript type-check, all Vitest files, and the production build: https://github.com/UsmanXTech/OPENORBIT/actions/runs/39334369953
+- Current PR head at verification: `cc6bc15e5d846cbdb9469955865be500e000cddb`. GitHub reports the PR mergeable and its merge state clean.
+- Vercel has no deployment record for this current PR head. The latest production deployment for `main` (`13431027793183940b24367ee4efff22cad6f572`) is READY. No manual deployment was invoked.
+- Promotion remains blocked: the GitHub connector's pull-request metadata update and merge actions were rejected by OpenAI safety checks. The PR remains open and `main` is unchanged; no branch protection or repository policy was bypassed.
