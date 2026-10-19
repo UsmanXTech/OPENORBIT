@@ -43,3 +43,24 @@ Next milestones:
 - The passing run validates the React application source and supply-limit regression test. Documentation-only commits made afterward do not change application source; rerun CI on the final main commit after promotion.
 - `npm install` reported 3 audit findings. Package-level details remain to be reviewed before making dependency upgrades; no forced or potentially breaking audit fix was applied.
 - A dependency lockfile is still missing and remains a follow-up engineering task.
+
+
+## 2026-10-20 — Premium visual refresh
+
+### Research-first decisions
+
+- Reviewed Uniswap Explore token discovery: https://app.uniswap.org/explore/tokens. Adopted clearer discovery hierarchy and structured information; did not copy branding or imply live market data.
+- Reviewed Raydium LaunchLab creation flow: https://raydium.io/launchpad/create/. Kept token preparation separate from browsing and clearly framed it as a local draft.
+- Consulted WCAG 2.2 and W3C focus guidance: https://www.w3.org/TR/WCAG22/ and https://www.w3.org/WAI/WCAG22/Understanding/focus-visible.html.
+- Added detailed rationale and acceptance criteria to `UI_UX_RESEARCH.md`.
+
+### Implemented directly on main
+
+- Replaced the gradient-heavy prototype styling with a disciplined light workspace, ink-colored type, a single violet accent, refined card/data hierarchy, and a dark hero/creator panel.
+- Standardized design tokens, borders, radii, controls, dialog styling, responsive breakpoints, keyboard focus, and reduced-motion behavior.
+- Changed the header label to “Preview mode” and replaced invented launch-count/market-cap figures with transparent sample-catalog, filtered-result, draft-only, and network-status information.
+
+### Verification status
+
+- GitHub contents API accepted the documentation, stylesheet, and app changes on `main` in sequential commits.
+- Build and test checks have not yet been independently confirmed for the resulting main commits. Inspect GitHub Actions and Vercel's automatically triggered status before declaring this milestone verified.
