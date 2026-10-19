@@ -20,13 +20,13 @@ describe("OPENORBIT marketplace preview",()=>{
   const user=userEvent.setup(); render(<App />);
   const listedAssets=screen.getByText("Listed assets").parentElement;
   expect(listedAssets).toHaveTextContent("06");
-  expect(screen.getByText("Showing 6 of 6 sample assets")).toBeInTheDocument();
+  expect(screen.getByText((_,element)=>element?.classList.contains("results-summary"))).toHaveTextContent("Showing 6 of 6 sample assets");
   await user.type(screen.getByRole("textbox",{name:"Search assets"}),"Nebula");
   expect(listedAssets).toHaveTextContent("06");
-  expect(screen.getByText("Showing 1 of 6 sample assets")).toBeInTheDocument();
+  expect(screen.getByText((_,element)=>element?.classList.contains("results-summary"))).toHaveTextContent("Showing 1 of 6 sample assets");
   await user.click(screen.getByRole("button",{name:"Clear search & filters"}));
   expect(screen.getByText("Lumen Protocol")).toBeInTheDocument();
-  expect(screen.getByText("Showing 6 of 6 sample assets")).toBeInTheDocument();
+  expect(screen.getByText((_,element)=>element?.classList.contains("results-summary"))).toHaveTextContent("Showing 6 of 6 sample assets");
  });
  it("labels wallet and chain states as preview-only, not as a live testnet",()=>{
   render(<App />);
