@@ -62,3 +62,31 @@ Reviewed the React UI in `src/App.tsx`, styles in `src/styles.css`, sample data 
 - Keyboard focus, labels, errors, responsive behavior, and empty states are considered.
 - Relevant tests, type-check, and production build pass in CI; if unavailable or failing, the limitation is recorded truthfully.
 - The change is reviewed against the latest `main` before committing. Never deploy Vercel as part of this workflow.
+
+
+## 2026-10-20 — Premium visual redesign direction
+
+### Real product examples reviewed before implementation
+
+5. **Uniswap Explore — token discovery**  
+   https://app.uniswap.org/explore/tokens  
+   Observed patterns: clear product navigation, prominent search, distinct discovery categories, and structured tabular information for comparing assets. Transfer the clear information hierarchy and discovery-first controls; do not copy Uniswap branding, wallet flows, or imply that OPENORBIT has live prices, volume, or chain data.
+6. **Raydium LaunchLab — token creation flow**  
+   https://raydium.io/launchpad/create/  
+   Observed pattern: creation is a dedicated task with explicit configuration steps rather than a generic call-to-action. Transfer the separation between browsing and preparing a launch draft; do not imply that OPENORBIT can create a token or submit a transaction.
+7. **W3C WCAG 2.2**  
+   https://www.w3.org/TR/WCAG22/ and https://www.w3.org/WAI/WCAG22/Understanding/focus-visible.html  
+   Preserve visible focus, semantic labels, contrast, and clear feedback while refining the visual style.
+
+### Design decision
+
+The existing page relies on multiple large gradients, glowing decorative effects, dense rounded surfaces, and a dark blue palette that makes the interface feel more like a generic prototype than a finished product. The redesign uses a more disciplined editorial hierarchy, warm light workspace surfaces, ink-colored text, a single violet accent, consistent borders and radii, tighter data hierarchy, and a dark hero panel as a deliberate focal point. Existing responsive breakpoints, reduced-motion support, visible keyboard focus, and demo-only disclosures must remain intact.
+
+### Acceptance criteria
+
+- Establish a coherent design-token system and consistent surface, spacing, typography, button, input, card, and modal treatments.
+- Keep navigation and primary actions clear at desktop and mobile widths.
+- Use color and text together for state; never present a live connection or production network that is not configured.
+- Keep all sample metrics explicitly identified as illustrative and all wallet/deployment actions non-live.
+- Preserve keyboard focus, reduced-motion behavior, and readable form errors.
+- Run typecheck, tests, and production build; record actual outcomes and do not claim unrun checks passed.
