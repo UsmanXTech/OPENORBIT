@@ -52,3 +52,10 @@ Next milestones:
 - Kept “Listed assets” tied to the full sample catalog, added a separate live result count, and added a one-action reset for search and category filters.
 - Added regression tests for stable totals, result-count updates, reset behavior, and preview-state wording.
 - Verification: local dependency installation and test execution are unavailable in this tool environment. Check the GitHub Actions run for the new commit before treating the change as verified. No Vercel deployment was invoked.
+
+## 2026-10-20 — UI/UX branch verification follow-up
+
+- The first catalog-summary test matcher introduced a TypeScript error because optional chaining returned `boolean | undefined`. The Vercel preview build exposed it; the matcher now returns a strict boolean via `Boolean(element?.classList.contains("results-summary"))`.
+- The subsequent preview build for commit `884e093a411d635d12f7c6517bb539b1e7921279` reached `READY`, and the associated Vercel status is successful. This confirms the TypeScript check and production build only; it does **not** confirm Vitest tests, which Vercel's configured build command does not run.
+- GitHub Actions workflow runs were not available for this branch, and the pull-request creation attempt was blocked by the tool safety checks. The UI/UX changes remain on `automation/uiux-preview-catalog`; `main` is unchanged.
+- No manual Vercel deployment was invoked. Wallet integration, live trading, and token deployment remain disabled.
