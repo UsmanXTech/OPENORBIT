@@ -64,3 +64,14 @@ Next milestones:
 
 - GitHub contents API accepted the documentation, stylesheet, and app changes on `main` in sequential commits.
 - Build and test checks have not yet been independently confirmed for the resulting main commits. Inspect GitHub Actions and Vercel's automatically triggered status before declaring this milestone verified.
+
+
+## 2026-10-20 — Launch-draft form feedback and keyboard recovery
+
+- Reviewed W3C WAI's form-validation and user-notification guidance, the official Raydium LaunchLab creation walkthrough, and WCAG 2.2 before changing the launch-draft form. Research and transfer decisions are recorded in `UI_UX_RESEARCH.md`.
+- Replaced the generic launch-draft validation message with field-specific name, symbol, and total-supply guidance.
+- Added `aria-invalid` and `aria-describedby` associations, a concise submit summary, and focus placement on the first invalid field. Editing a field clears only its own stale error.
+- Updated the visual treatment so invalid inputs and helper text are distinguishable while retaining the global high-contrast keyboard focus indicator.
+- Added regression coverage for all-empty submission, first-invalid focus, linked supply-range feedback, and clearing a field error after correction.
+- Safety boundary unchanged: drafts are local UI state; no wallet connection, contract generation, signature, deployment, or trade is enabled.
+- Verification at branch preparation: CI has not yet completed for this change. Confirm type-check, Vitest, production build, and Vercel preview before merging. No manual deployment was invoked.
