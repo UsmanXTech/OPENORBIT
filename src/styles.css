@@ -161,6 +161,7 @@ h3 { margin: 0 0 3px; font-size: 14px; font-weight: 750; letter-spacing: -.02em;
 .walletopt:hover { border-color: #c7bcff; background: #fbfaff; }
 .walleticon { display: grid; place-items: center; width: 38px; height: 38px; flex: none; border-radius: 11px; background: var(--accent-soft); color: var(--accent); font-weight: 850; }
 .walletopt .symbol { margin-top: 3px; }
+.field-group { min-width: 0; }
 .formgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; margin: 16px 0; }
 .formgrid label { display: block; color: #4f505b; font-size: 11px; font-weight: 700; }
 .formgrid input { display: block; width: 100%; min-width: 0; margin-top: 6px; padding: 11px; border: 1px solid var(--border-strong); border-radius: 9px; background: white; color: var(--text); font-size: 12px; }
