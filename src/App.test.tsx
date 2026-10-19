@@ -16,6 +16,25 @@ describe("OPENORBIT marketplace preview",()=>{
   expect(screen.getByText("Nebula Network")).toBeInTheDocument();
   expect(screen.queryByText("Lumen Protocol")).not.toBeInTheDocument();
  });
+ it("shows the matching sample count and clears the search field",async()=>{
+  const user=userEvent.setup(); render(<App />);
+  const search=screen.getByRole("textbox",{name:"Search assets"});
+  await user.type(search,"Nebula");
+  expect(screen.getByText(/Showing 1 of \d+ sample assets/)).toBeInTheDocument();
+  await user.click(screen.getByRole("button",{name:"Clear search"}));
+  expect(search).toHaveValue("");
+  expect(screen.getByText(/Showing all \d+ sample assets/)).toBeInTheDocument();
+ });
+ it("recovers from an empty result by resetting search and category filters",async()=>{
+  const user=userEvent.setup(); render(<App />);
+  await user.click(screen.getByRole("button",{name:"Trending"}));
+  await user.type(screen.getByRole("textbox",{name:"Search assets"}),"Nebula");
+  expect(screen.getByText("No matching assets")).toBeInTheDocument();
+  await user.click(screen.getByRole("button",{name:"Reset search and filters"}));
+  expect(screen.getByText("Lumen Protocol")).toBeInTheDocument();
+  expect(screen.queryByText("No matching assets")).not.toBeInTheDocument();
+  expect(screen.getByText(/Showing all \d+ sample assets/)).toBeInTheDocument();
+ });
  it("filters to trending sample assets",async()=>{
   const user=userEvent.setup(); render(<App />);
   await user.click(screen.getByRole("button",{name:"Trending"}));
