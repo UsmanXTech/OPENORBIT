@@ -27,7 +27,8 @@
 ### Promotion
 
 - Direct commit `e892160` pushed to `main` (`cfec9e7..e892160`) after a fresh fetch; tree clean, no concurrent work, no open PRs, no branch protections bypassed.
-- CI on `e892160`: **success** (first attempt, no flake this run).
+- CI on `e892160` (feature): **success** (first attempt, no flake).
+- CI on `a3243e5` (docs-only): first attempt **failed** with the known pre-existing slow-runner flake ("moves keyboard focus to the field when a summary link is activated" — the view-heading 60ms focus timer steals focus mid-typing on loaded CI runners; same race as run #8 and run #14, and this run's feature changes touch none of that code); the workflow rerun flaked a second time on the same test, then **succeeded** on the third attempt. Final CI on main green; no code changed by the reruns.
 - Vercel: not touched (read-only; auto-deploys on Vercel's side).
 
 ## 2026-10-20 — Guide steps become an actionable task list (whole-row navigation)
