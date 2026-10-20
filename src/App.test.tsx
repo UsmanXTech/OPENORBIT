@@ -106,6 +106,7 @@ describe("OPENORBIT marketplace preview",()=>{
  it("reviews a launch draft without deploying it",async()=>{
   const user=userEvent.setup(); render(<App />);
   await user.click(screen.getByRole("tab",{name:"Launch"}));
+  await waitFor(()=>expect(screen.getByRole("heading",{name:"Create launch draft"})).toHaveFocus());
   await user.type(screen.getByRole("textbox",{name:"Token name"}),"Open Orbit");
   await user.type(screen.getByRole("textbox",{name:"Token symbol"}),"orbt");
   await user.type(screen.getByRole("spinbutton",{name:"Total supply"}),"1000000");
@@ -116,6 +117,7 @@ describe("OPENORBIT marketplace preview",()=>{
  it("rejects a supply above the documented maximum",async()=>{
   const user=userEvent.setup(); render(<App />);
   await user.click(screen.getByRole("tab",{name:"Launch"}));
+  await waitFor(()=>expect(screen.getByRole("heading",{name:"Create launch draft"})).toHaveFocus());
   await user.type(screen.getByRole("textbox",{name:"Token name"}),"Open Orbit");
   await user.type(screen.getByRole("textbox",{name:"Token symbol"}),"orbt");
   await user.type(screen.getByRole("spinbutton",{name:"Total supply"}),"1000000000000001");
@@ -130,6 +132,7 @@ describe("OPENORBIT marketplace preview",()=>{
  it("shows field-level errors and focuses the first invalid input",async()=>{
   const user=userEvent.setup(); render(<App />);
   await user.click(screen.getByRole("tab",{name:"Launch"}));
+  await waitFor(()=>expect(screen.getByRole("heading",{name:"Create launch draft"})).toHaveFocus());
   await user.click(screen.getByRole("button",{name:"Review draft"}));
   const name=screen.getByRole("textbox",{name:"Token name"});
   expect(name).toHaveAttribute("aria-invalid","true");
@@ -143,6 +146,7 @@ describe("OPENORBIT marketplace preview",()=>{
  it("clears an inline error when its field is corrected",async()=>{
   const user=userEvent.setup(); render(<App />);
   await user.click(screen.getByRole("tab",{name:"Launch"}));
+  await waitFor(()=>expect(screen.getByRole("heading",{name:"Create launch draft"})).toHaveFocus());
   await user.click(screen.getByRole("button",{name:"Review draft"}));
   const name=screen.getByRole("textbox",{name:"Token name"});
   await user.type(name,"Open Orbit");
