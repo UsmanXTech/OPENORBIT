@@ -209,17 +209,18 @@ h2, h3 { letter-spacing: -.045em; }
 .asset-detail-head { display: flex; align-items: center; gap: 14px; }
 .asset-detail-head > div:nth-child(2) { min-width: 0; flex: 1; }
 .asset-detail-head .coin { width: 52px; height: 52px; font-size: 19px; }
-.detail-eyebrow { margin: 0 0 3px; font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--subtle); }
-#asset-detail-title { margin: 0; font-size: 24px; font-weight: 780; letter-spacing: -.02em; }
+.detail-eyebrow { margin: 0 0 4px; font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+#asset-detail-title { margin: 0; font-size: clamp(24px, 3.4vw, 28px); font-weight: 780; letter-spacing: -.02em; line-height: 1.15; }
 #asset-detail-title:focus { outline: none; }
 #asset-detail-title:focus-visible { outline: 3px solid #8b78ff; outline-offset: 3px; }
 .detail-subline { display: flex; align-items: center; gap: 8px; margin-top: 5px; }
 .detail-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0; }
 .detail-stats > div { padding: 13px 15px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface-soft); }
-.detail-stats dt { color: var(--subtle); font-size: 10px; font-weight: 750; letter-spacing: .07em; text-transform: uppercase; }
-.detail-stats dd { margin: 6px 0 0; color: var(--text); font-size: 20px; font-weight: 780; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
-.detail-about h4 { margin: 0; font-size: 11px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; color: var(--subtle); }
-.detail-about p { margin: 8px 0 0; color: var(--text); font-size: 13px; line-height: 1.7; max-width: 62ch; }
+.detail-stats dt { color: var(--muted); font-size: 10px; font-weight: 750; letter-spacing: .07em; text-transform: uppercase; }
+.detail-stats dd { margin: 6px 0 0; color: var(--text); font-size: 20px; font-weight: 780; letter-spacing: -.02em; line-height: 1.25; font-variant-numeric: tabular-nums; }
+.detail-about { border-top: 1px solid var(--border); padding-top: 12px; }
+.detail-about h4 { margin: 0; font-size: 13px; font-weight: 700; color: var(--text); }
+.detail-about p { margin: 8px 0 0; color: var(--text); font-size: 14px; line-height: 1.65; max-width: 62ch; }
 .detail-fineprint { margin: 0; font-size: 11px; line-height: 1.6; color: var(--muted); }
 
 /* ---- Launch view ---- */

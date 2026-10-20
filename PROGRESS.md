@@ -486,3 +486,30 @@ Files changed: `src/App.tsx` (seg refs, `onFilterKeyDown`, roving tabindex, Esca
 
 - Direct commit `a6cb87d` pushed to `main` (`3fb7c3c..a6cb87d`) after a fresh fetch; tree clean, no concurrent work, no open PRs, no branch protections bypassed.
 - CI run 39384595809 on `a6cb87d`: **success** (typecheck + all tests + build, 20s). Vercel: not touched (read-only; auto-deploys on Vercel's side).
+
+## 2026-10-20 — Asset-detail typography hierarchy review
+
+- Starting state: `main` at `18178bb` (verified with `git fetch origin` + `git log --oneline -3 origin/main`); working tree clean; no open PRs; latest CI on main green.
+- This hour's highest-value improvement (the "Asset-detail typography hierarchy review" item from run #16): the asset detail card now has a coherent type ladder. Title 24px → `clamp(24px, 3.4vw, 28px)`/1.15 (clear 8px gap above the 20px KPI values, which previously sat only 4px below with no weight distinction); detail kicker 10px → 11px/800/.1em; "About this listing" was an 11px uppercase label identical to the KPI field labels — now a 13px/700 sentence-case section title with a hairline divider above the about section; KPI values get an explicit 1.25 line-height (inherited the body's airy 1.55 before); about prose 13px → 14px/1.65; fineprint stays 11px/1.6. CSS-only change — no behavior, markup, or layout-geometry change beyond ~4px on desktop.
+- Research (mandatory per-component; UI_UX_RESEARCH.md §41): Carbon type scale (page opened and read directly) + M3 type scale (via search excerpts — m3.material.io fetch timed out; Uniswap SPA returned no readable content; both recorded as limitations). Applied: discrete Carbon scale steps, deliberate size+weight pairing, semibold-for-headers-not-prose rule; M3 labelSmall 11/16 and bodyMedium 14/20 mappings.
+- Accessibility fix found during review: the 10px KPI labels and 10px kicker in `--subtle` (#858792) were below WCAG 1.4.3 AA for small text (≈3.4:1 on white) — both moved to `--muted` (#696b75, ≈5.4:1), section title to `--text`; tiers also carry weight/case/divider distinctions, never size alone.
+
+### Verification (real runs, Node)
+
+- `npm run typecheck`: passed (`tsc --noEmit`, no errors).
+- `npm test`: 43/43 passed on three consecutive runs. One earlier invocation in this run showed 1 failed (test name not captured — summary only), consistent with the previously documented view-heading focus-timer flake on CI/slow runners; could not be reproduced in the three subsequent full runs (3× 43/43), so no code change was made — recorded, not hidden.
+- `npm run build`: passed (production bundle built to `dist/`).
+
+### Files changed
+
+- `src/styles.css` — detail type ladder (title clamp, kicker 11px, about section title + divider, stat line-heights, prose 14px, contrast fixes).
+- `UI_UX_RESEARCH.md` — session 41 (mandatory per-component research).
+- `PROGRESS.md` — this entry.
+
+### Promotion
+
+- Direct commit pushed to `main` after a fresh fetch (tree clean, no concurrent work, no open PRs); CI green on the promoted commit (verified via `gh run list` after push); Vercel not touched (read-only).
+
+### Next
+
+- Record CI result on the promoted commit; next UX candidate: Launch-view draft-review card typography or the Explore empty-state copy/density pass.
