@@ -25,6 +25,11 @@
 
 - Verify CI on the promoted commit. Next UX candidate: Launch-view density polish (the last queued item) — the form grid's field spacing/typography, within the no-scroll shell.
 
+### Promotion
+
+- Direct commit `c172d1c` pushed to `main` (`ac113d7..c172d1c`) after a fresh fetch; tree clean, no concurrent work, no open PRs, no branch protections bypassed.
+- CI: checking below; Vercel: not touched (read-only; auto-deploys on Vercel's side).
+
 
 ## 2026-10-20 — Explore empty-state recovery pass: diagnosis copy + granular recovery actions
 
