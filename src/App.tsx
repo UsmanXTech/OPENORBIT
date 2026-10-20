@@ -70,6 +70,9 @@ export default function App() {
     guide: null,
   });
   const detailHeading = useRef<HTMLHeadingElement>(null);
+  // Explore search input: recovery actions from the empty state return
+  // keyboard focus here so the user can refine and re-run the search.
+  const searchInput = useRef<HTMLInputElement>(null);
 
   const activate = useCallback((next: View, focusHeading: boolean) => {
     setView(next);
@@ -153,6 +156,69 @@ export default function App() {
     setFilter("all");
     setSortKey("featured");
   }, []);
+
+  // Empty-state recovery (PatternFly "No results" pattern): granular
+  // single-purpose recovery actions — clear just the search term or just the
+  // category filter — each returning focus to the search box so the user can
+  // refine and re-run the search without hunting for their place.
+  const clearEmptySearch = useCallback(() => {
+    setQuery("");
+    searchInput.current?.focus();
+  }, []);
+  const clearEmptyFilter = useCallback(() => {
+    setFilter("all");
+    searchInput.current?.focus();
+  }, []);
+
+  // Empty-state diagnosis (PatternFly / Atlassian / Carbon guidance): the
+  // heading states the outcome in sentence case with no punctuation, the body
+  // echoes back the user's actual search term and/or active category so they
+  // can recognize and diagnose the miss, and the guidance names the recovery.
+  const renderEmptyState = () => {
+    const q = query.trim();
+    const hasQuery = q.length > 0;
+    const hasFilter = filter !== "all";
+    const filterLabel =
+      filters.find((f) => f.value === filter)?.label ?? "All";
+    const diagnosis =
+      hasQuery && hasFilter
+        ? `No sample assets match “${q}” in the ${filterLabel} category.`
+        : hasQuery
+          ? `No sample assets match “${q}”.`
+          : hasFilter
+            ? `No sample assets in the ${filterLabel} category.`
+            : "No sample assets match the current filters.";
+    return (
+      <div className="empty">
+        <div>
+          <h3 className="empty-title">No results found</h3>
+          <p>
+            {diagnosis} Adjust your search or filters and try again.
+          </p>
+        </div>
+        <div className="empty-actions">
+          {hasQuery && (
+            <button
+              className="btn sm"
+              type="button"
+              onClick={clearEmptySearch}
+            >
+              Clear search
+            </button>
+          )}
+          {hasFilter && (
+            <button
+              className="btn sm"
+              type="button"
+              onClick={clearEmptyFilter}
+            >
+              Show all assets
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  };
 
   // Tri-state column sort (Carbon data-table pattern): first click sorts by
   // the column default, second reverses, third restores featured order.
@@ -500,6 +566,7 @@ export default function App() {
                     </svg>
                     <input
                       className="field"
+                      ref={searchInput}
                       value={query}
                       onChange={(e) => setQuery(e.target.value)}
                       onKeyDown={(e) => {
@@ -535,22 +602,7 @@ export default function App() {
                   </div>
                 )}
                 {visible.length === 0 ? (
-                  <div className="empty">
-                    <div>
-                      <strong>No matching assets</strong>
-                      <p>
-                        Try a different name or symbol, or reset your search and
-                        filters.
-                      </p>
-                    </div>
-                    <button
-                      className="btn"
-                      type="button"
-                      onClick={resetSearchAndFilters}
-                    >
-                      Reset search and filters
-                    </button>
-                  </div>
+                  renderEmptyState()
                 ) : (
                   <div className="tablewrap">
                     <table className="token-table">

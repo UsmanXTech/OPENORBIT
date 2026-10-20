@@ -1,5 +1,33 @@
 # Engineering progress
 
+## 2026-10-20 — Explore empty-state recovery pass: diagnosis copy + granular recovery actions
+
+- Starting state: `main` at `f73f329` (verified with `git fetch origin` + `git log --oneline -3 origin/main`); working tree had one local-only docs edit (run #12's Promotion fill-in, folded into this run's commit); no open PRs; latest CI on main green.
+- This hour's highest-value improvement: the Explore catalog empty state now follows the PatternFly "No results" empty-state pattern instead of the old generic "No matching assets" block. The heading is "No results found" (sentence case, no punctuation), and the body echoes back the user's actual search term and/or active category filter — e.g. `No sample assets match “Nebula” in the Trending category.` — so the miss is recognizable and diagnosable, followed by "Adjust your search or filters and try again." The single generic "Reset search and filters" button is replaced with granular recovery actions: "Clear search" (query only) and "Show all assets" (category filter only), up to two per the Atlassian CTA ceiling, each naming exactly what it undoes. Both recovery actions return keyboard focus to the search input since their own button unmounts. The heading is now a real `h3` (was `<strong>`); no second live region was added — the existing `aria-live="polite"` result count ("Showing 0 of N sample assets") already announces the state. All within the screen-fitted no-scroll shell, no layout-height change.
+- Research (mandatory per-component; UI_UX_RESEARCH.md §32–34): PatternFly Empty state design guidelines (page opened directly) — the "No results" variant's DO/DON'T copy pairs (heading "No results found", body "Adjust your filters and try again.", stand-alone secondary buttons for filtering/search, sentence case, small variation inside tables); Atlassian Design empty-state guidance (page opened directly) — imperative one-to-two-word CTAs that complement the title, two-action ceiling, title/body non-redundancy; Carbon Design System empty-states (via search excerpts, limitation documented) — Nielsen's recognize/diagnose/recover, no dead ends, plain language. Not transferred: PatternFly's fa-search icon (toolbar already carries the signifier), Atlassian's celebratory tone layer (low-commitment recurring moment), any illustration (density).
+- Accessibility: recovery buttons are real buttons with existing `:focus-visible` treatment; focus returns to the search input on recovery (no focus loss to `body`); state is text, never color-only; no new keyboard contracts; user input in the diagnosis is React-escaped.
+
+### Verification (real runs, Node)
+
+- `npm run typecheck`: passed (`tsc --noEmit`, no errors).
+- `npm test`: 36/36 passed (18 app + 7 search — 1 replaced, 4 new: diagnosis echo, clear-search recovery + focus, show-all recovery, full recovery via toolbar reset — + 6 sort + 5 no-scroll invariants).
+- `npm run build`: passed (production bundle built to `dist/`).
+
+### Files changed
+
+- `src/App.tsx` — `searchInput` ref; `clearEmptySearch` / `clearEmptyFilter` recovery handlers with focus return; `renderEmptyState()` helper with contextual diagnosis copy and granular actions; empty-state block replaced with the helper; search input wired to the ref.
+- `src/styles.css` — `.empty strong` → `.empty-title` (real `h3` styling); new `.empty-actions` button row.
+- `src/App.search.test.tsx` — rewrote the stale "No matching assets"/"Reset search and filters" test; 4 new tests covering diagnosis echo, per-action recovery, and focus return.
+- `UI_UX_RESEARCH.md` — sessions 32–34 (mandatory per-component research).
+
+### Next
+
+- Verify CI on the promoted commit. Next UX candidate: Guide view content-density polish (already has a short-viewport density pass; revisit for typographic hierarchy) or Launch-view density polish — both within the no-scroll shell.
+
+### Promotion
+
+- (to be filled after promotion)
+
 ## 2026-10-20 — Wallet honest-status redesign: connection-status report replaces fake connect buttons
 
 - Starting state: `main` at `700f9cf` (verified with `git fetch origin` + `git log --oneline -3 origin/main`); working tree clean; no open PRs; latest CI on main green.
@@ -27,7 +55,8 @@
 
 ### Promotion
 
-- (to be filled after promotion)
+- Direct commit `f73f329` pushed to `main` (`700f9cf..f73f329`) after a fresh fetch; tree clean, no concurrent work, no open PRs, no branch protections bypassed.
+- CI run 39391832805 on `f73f329`: **success** (typecheck + all tests + build, 24s). Vercel: not touched (read-only; auto-deploys on Vercel's side).
 
 - Starting state: `main` at `310f188` (verified with `git fetch origin` + `git log --oneline -3 origin/main`); working tree clean; no open PRs; latest CI on main green.
 - This hour's highest-value improvement: the Launch draft form's error summary now follows the GOV.UK error-summary pattern — it renders ABOVE the form fields (previously it sat below them, just before the submit button), and each summary link now moves keyboard focus to its field explicitly via the field refs. The old plain `href="#id"` anchors could not reliably do this in the no-scroll shell; the links keep their `href`s for semantics but their click handlers `preventDefault()` and focus the input. First-invalid-field focus on submit is unchanged (tested contract), so no behavior regresses; the summary's wording still matches the inline errors verbatim per the GOV.UK rule, `role="alert"` is preserved, and `aria-invalid`/`aria-describedby` associations are untouched.
