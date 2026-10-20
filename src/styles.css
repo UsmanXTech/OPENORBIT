@@ -229,7 +229,10 @@ h2, h3 { letter-spacing: -.045em; }
 .walletopt .symbol { margin-top: 3px; }
 
 /* ---- Guide view ---- */
-.guide-view { max-width: 860px; margin: 0 auto; width: 100%; padding-top: 8px; }
+.guide-view {
+  flex: 1; min-height: 0; overflow-y: auto;
+  max-width: 860px; margin: 0 auto; width: 100%; padding-top: 8px;
+}
 .guide-sub { color: var(--muted); font-size: 13px; margin: 6px 0 0; }
 .guide-steps { list-style: none; margin: 16px 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
 .guide-steps li { padding: 16px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface); box-shadow: var(--shadow-card); }
@@ -274,4 +277,23 @@ h2, h3 { letter-spacing: -.045em; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+
+/* Short viewports: tighten density so the single-screen fit holds and the
+   last-resort internal scroll regions engage as rarely as possible. */
+@media (max-height: 700px) {
+  .view { padding: 12px 0 10px; gap: 10px; }
+  .view h2 { font-size: 24px; }
+  .explore-head { gap: 4px; }
+  .toolbar { gap: 8px; }
+  .tablewrap { border-radius: 12px; }
+  .asset-detail-page { padding: 14px 16px; }
+  .launch-grid { gap: 18px; }
+  .launch-card { padding: 16px; }
+  .formgrid { gap: 10px; margin: 10px 0; }
+  .guide-view { padding-top: 4px; }
+  .guide-steps { margin: 10px 0; gap: 10px; }
+  .guide-steps li { padding: 12px; }
+  .wallet-grid { margin: 10px 0; }
+  .statusstrip-inner { min-height: 30px; padding-top: 4px; padding-bottom: 4px; }
 }

@@ -195,3 +195,33 @@ Files changed: `src/App.tsx`, `src/styles.css`, `src/App.test.tsx`, `UI_UX_RESEA
 
 - Direct commit + push to `main` after a fresh `git fetch origin`; promotion status verified below (CI run on the new main head).
 - Next run: per-view height audit on short/narrow viewports (verify the no-scroll claim renders scroll-free at 360×640 and 1366×768), then continue the UI/UX redesign priority — e.g. richer Explore table affordances (column sort headers replacing the select) or Launch-view density polish.
+
+## 2026-10-20 — No-scroll audit at 360×640 / 1366×768 + Guide-view clipping fix
+
+### Research-first decisions (UI_UX_RESEARCH.md sessions 20–21)
+
+- Observed the live Uniswap app https://app.uniswap.org/explore/tokens read-only: page-scroll model with fixed nav + sticky column header (~69px rows, ~13–14 visible per 1080px height). Adopted the sticky-header affordance inside OPENORBIT's internal table scroll region; kept the user-mandated 100dvh no-scroll shell (a deliberate divergence, documented honestly). 360px mobile behavior unobservable — reported as unknown, not inferred.
+- Consulted W3C WCAG 2.2 Understanding SC 1.4.10 Reflow http://w3c.github.io/wcag/understanding/reflow: internal scrolling is the sanctioned pattern for data tables and toolbars-that-stay-in-view interfaces — which is exactly the Explore view. No 2D page scroll anywhere by construction.
+
+### Audit findings (analytical — live pixel audit blocked, see below)
+
+- Page scroll is structurally impossible (`body { overflow: hidden }` + 100dvh flex shell). At 1366×768 all four views + detail + empty state fit with zero scrolling.
+- At 360×640, Explore table / Launch grid / asset detail engage their documented last-resort internal scroll regions — consistent with the rule.
+- **Bug found:** the Guide view had NO scroll container: at 360×640 its content (~600px: header + 4 step cards + notice) exceeded the available ~504px and was clipped unreachable. Fixed: `.guide-view` now has `flex: 1; min-height: 0; overflow-y: auto` (same last-resort pattern as the other panels).
+- Added a `@media (max-height: 700px)` density pass (tighter view padding/gaps, smaller section padding) so internal scroll regions engage as rarely as possible on short viewports.
+
+### Verification
+
+- New regression suite `src/noscroll.test.ts` (5 tests) reads `src/styles.css` and asserts the hard-rule invariants: body never scrolls, shell is exactly 100dvh, flex chain cannot collapse panels, every panel has `overflow-y: auto`, header tab strip cannot grow the header taller. `src/node-types.d.ts` provides minimal ambient types so the suite typechecks without adding @types/node to app dependencies.
+- `npm run typecheck`: pass. `npm test`: 22/22 pass. `npm run build`: pass.
+- Audit-method limitation: the browser agent cannot reach loopback URLs, execute in-page JS, or resize viewports, and no Playwright/Chromium exists in this sandbox — so no real-pixel measurements this run; geometry was verified analytically and the key invariants are now test-guarded.
+
+### Files changed
+
+- `src/styles.css` — Guide-view internal scroll container; short-viewport density media query.
+- `src/noscroll.test.ts` (new), `src/node-types.d.ts` (new) — no-scroll invariant regression suite.
+- `UI_UX_RESEARCH.md` — sessions 20–21 + honest-limitations update.
+
+### Next
+
+- Verify CI on the promoted commit; continue the honest no-scroll verification with real pixel measurements when a browser with viewport control is available (or a reachable staging URL); next UX increment candidate: Explore empty-state and toolbar density review.
