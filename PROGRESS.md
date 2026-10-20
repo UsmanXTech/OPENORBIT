@@ -26,8 +26,8 @@
 
 ### Promotion
 
-- Direct commit pushed to `main` after a fresh fetch; tree clean, no concurrent work, no open PRs, no branch protections bypassed.
-- CI: [filled after run observed].
+- Direct commit `e892160` pushed to `main` (`cfec9e7..e892160`) after a fresh fetch; tree clean, no concurrent work, no open PRs, no branch protections bypassed.
+- CI on `e892160`: **success** (first attempt, no flake this run).
 - Vercel: not touched (read-only; auto-deploys on Vercel's side).
 
 ## 2026-10-20 — Guide steps become an actionable task list (whole-row navigation)
