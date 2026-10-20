@@ -239,7 +239,7 @@ Files changed: `src/App.tsx`, `src/styles.css`, `src/App.test.tsx`, `UI_UX_RESEA
 - `npm run typecheck`: passed (`tsc --noEmit`, no errors).
 - `npm test`: 28/28 passed (15 app + 6 new sort-header tests in `src/App.sort.test.tsx` + 2 search + 5 no-scroll invariants).
 - `npm run build`: passed (production bundle built to `dist/`).
-- Live no-scroll pixel audit: delegated to the browser agent against https://openorbit.vercel.app at 360×640 / 1366×768 / 1920×1080 (per-viewport scroll measurements for all views + detail + empty state). Result pending — will be recorded on delivery; if it finds residual page scroll or clipping, fixes ship in the next run.
+- Live no-scroll pixel audit: attempted via the browser agent against https://openorbit.vercel.app at 360×640 / 1366×768 / 1920×1080 — **blocked at the tooling level**: the browser environment exposes no viewport resize and no in-page JS execution, so `scrollHeight`/`clientHeight`/`scrollY` cannot be measured at any size. What WAS verified qualitatively: the site loads cleanly; Explore table, inline asset Details view, empty state (`zzzzno-match` → "No matching assets" + reset), Launch form, Wallet panel, and Guide cards all render fully at the default viewport with no clipping and no horizontal overflow; a full-page scroll attempt produced no visible change, consistent with the no-page-scroll design (qualitative only, not measured). Honest conclusion: the structural guarantee (`body { overflow: hidden }` + 100dvh shell, guarded by the `noscroll.test.ts` invariant suite) still stands; real pixel measurements remain unavailable in this environment — retry when viewport/JS tooling exists.
 
 ### Files changed
 
