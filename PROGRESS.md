@@ -140,3 +140,18 @@ Next milestones:
 - `npm run build`: passed (production bundle built to `dist/`).
 
 Files changed: `src/App.tsx`, `src/styles.css`, `src/App.test.tsx`, `README.md`, `UI_UX_RESEARCH.md`, `PROGRESS.md`.
+
+## 2026-10-20 — Asset detail converted from dialog to inline page
+
+- The asset-detail Dialog was removed and replaced with a full inline detail page rendered inside `#explore`, replacing the catalog grid while open (per the prefer-inline-over-dialogs rule; the wallet dialog remains as the sole informational interstitial). The dialog union is now `"wallet"|null`.
+- The inline detail page opens with a descriptive "← Back to explore assets" back link (GOV.UK back-link pattern), followed by the identity header, sample-labeled stats grid, "About this listing" section, sample-data notice, and a "Back to catalog" button (Uniswap token-detail page pattern: identity → stats → info in page flow).
+- Focus management: opening moves focus to the detail heading (`tabIndex={-1}`, scroll-guarded); Escape closes the view; closing restores focus to the triggering "View details" button and preserves catalog search/filter/sort state.
+- New CSS: `.asset-detail-page` panel, `.back-link` accent back link with `focus-visible` ring, programmatic-focus handling on the detail heading; stats grid collapses to one column under 680px.
+
+### Verification (real runs, Node)
+
+- `npm run typecheck`: passed (`tsc --noEmit`, no errors).
+- `npm test`: 15/15 passed (2 new/rewritten: inline-detail rendering with heading focus + no-dialog assertion, Escape-close; focus-restore assertion on back-to-catalog).
+- `npm run build`: passed (production bundle built to `dist/`).
+
+Files changed: `src/App.tsx`, `src/styles.css`, `src/App.test.tsx`, `UI_UX_RESEARCH.md`, `PROGRESS.md`.

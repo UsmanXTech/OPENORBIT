@@ -159,3 +159,23 @@ The launch-draft form previously returned one generic error for three different 
     - What does not transfer: GOV.UK's convention of moving keyboard focus to the summary container — OPENORBIT's standing behavior (and existing tests) focuses the first invalid field directly on failed submit, which also satisfies "land the user on the problem"; the summary links give the same jump-to-field capability as an additional path.
     - Why it suits OPENORBIT: without a modal trap, the failed submit now gives users two ways to recover — immediate focus on the first invalid field plus a scannable summary of everything that needs fixing.
     - Accessibility/responsive implications: links inside the alert are reachable by keyboard and announced with their destination context; the summary styles reuse the existing danger palette with visible `focus-visible` rings on the links; it reflows naturally inside the form card on narrow viewports.
+
+## 2026-10-20 — Asset detail: dialog → inline page conversion
+
+### Real references reviewed before implementation
+
+12. **Uniswap support — "What is the Token Details page?"**
+    http://support.uniswap.org/hc/en-us/articles/9818052307341-What-is-the-Token-Details-page
+    - Patterns observed: a token's detail is a full inline page, never a popup — identity header (token icon, name, symbol) at top, then a structured Stats section (TVL, market cap, FDV, 1-day volume), then Transactions/Pools data sections, then an Info section (description + links). Sections stack vertically in the normal page flow.
+    - What transfers: the asset detail now renders as an inline page section that replaces the catalog grid; it keeps the existing identity header (coin, name, symbol · category, tag badge), the sample-labeled stats grid, and the "About this listing" section, in the same top-down order as Uniswap's identity → stats → info stack.
+    - What does not transfer: Uniswap's live price charts, transaction/pool tables, and swap CTAs — OPENORBIT is a read-only demo with sample data only, so the detail stays read-only and every metric keeps its "Sample" label; no live-data claims.
+    - Why it suits OPENORBIT: the detail content is informational reading (scan stats, read the description, go back), not a confirmation or short decision — exactly the content type that dialog accessibility guidance says should live in page flow; it matches the discovery pattern users already know from Uniswap Explore.
+    - Accessibility/responsive implications: opening the detail moves programmatic focus to the detail heading (`tabIndex={-1}`, scroll-guarded) so screen readers announce the new context; Escape closes it; focus returns to the triggering "View details" button; catalog search/filter state is preserved on return (no data loss); on narrow viewports the stats grid collapses to one column.
+
+13. **GOV.UK Design System — Back link**
+    https://design-system.service.gov.uk/components/back-link/
+    - Patterns observed: on journeys with several areas, provide an explicit back link at the top of the page; prefer descriptive link text ("Go back to [page]") when the journey is not a simple one-step flow; the link must return the user to the previous page in the state they last saw it; never pair it with breadcrumbs.
+    - What transfers: the detail page opens with an explicit "← Back to explore assets" link (descriptive text, per GOV.UK's complex-journey guidance) placed at the top of the detail panel; returning restores the catalog exactly as left — same search query, filter tab, and sort — and the same back behavior is duplicated by the bottom "Back to catalog" button.
+    - What does not transfer: GOV.UK's placement before `<main>` (OPENORBIT is a single-page demo, so the link sits at the top of the detail panel inside the page); no breadcrumb component is introduced.
+    - Why it suits OPENORBIT: the detail view is a second-level view inside the explore journey, and an explicit back link is the most discoverable way out for sighted and screen-reader users alike — clearer than relying on Escape or an × button alone.
+    - Accessibility/responsive implications: the back link is a native `<button>` with the app's standard `focus-visible` ring, recolored to the accent palette; it sits first in tab order on the detail view so keyboard users encounter the escape hatch immediately.

@@ -40,8 +40,9 @@ export default function App(){
   const [filter,setFilter]=useState<AssetFilter>("all");
   const [query,setQuery]=useState("");
   const [sort,setSort]=useState<AssetSort>("featured");
-  const [dialog,setDialog]=useState<"wallet"|"asset"|null>(null);
-  const [selected,setSelected]=useState<Asset|null>(null);
+  const [dialog,setDialog]=useState<"wallet"|null>(null);
+  const [selectedId,setSelectedId]=useState<string|null>(null);
+  const [returnToId,setReturnToId]=useState<string|null>(null);
   const [walletNotice,setWalletNotice]=useState("No connection request will be sent.");
   const [notice,setNotice]=useState("");
   const [draftErrors,setDraftErrors]=useState({name:"",symbol:"",supply:""});
@@ -50,7 +51,35 @@ export default function App(){
   const nameInput=useRef<HTMLInputElement>(null);
   const symbolInput=useRef<HTMLInputElement>(null);
   const supplyInput=useRef<HTMLInputElement>(null);
+  const detailHeading=useRef<HTMLHeadingElement>(null);
   const closeDialog=useCallback(()=>setDialog(null),[]);
+  const selected=selectedId?sampleAssets.find(a=>a.id===selectedId)??null:null;
+  const openDetail=useCallback((a:Asset)=>{
+    setReturnToId(a.id);
+    setSelectedId(a.id);
+  },[]);
+  const closeDetail=useCallback(()=>setSelectedId(null),[]);
+  useEffect(()=>{
+    if(!selectedId) return;
+    detailHeading.current?.focus({preventScroll:true});
+    const el=document.getElementById("asset-detail");
+    if(el&&typeof el.scrollIntoView==="function") el.scrollIntoView({block:"start"});
+  },[selectedId]);
+  useEffect(()=>{
+    if(selectedId) return;
+    if(!returnToId) return;
+    const trigger=document.querySelector<HTMLButtonElement>(`button[data-detail-trigger="${returnToId}"]`);
+    trigger?.focus({preventScroll:true});
+    setReturnToId(null);
+  },[selectedId,returnToId]);
+  useEffect(()=>{
+    if(!selectedId) return;
+    const onKey=(event:KeyboardEvent)=>{
+      if(event.key==="Escape"){event.preventDefault();closeDetail();}
+    };
+    document.addEventListener("keydown",onKey);
+    return ()=>document.removeEventListener("keydown",onKey);
+  },[selectedId,closeDetail]);
   const resetSearchAndFilters=useCallback(()=>{setQuery("");setFilter("all");},[]);
   const scrollToLaunch=useCallback(()=>{
     setDraftErrors({name:"",symbol:"",supply:""});setResult(null);
@@ -106,6 +135,16 @@ export default function App(){
         <div className="stat"><label>Network</label><strong>Not connected</strong><small>No chain configured</small></div>
       </section>
       <section id="explore">
+        {selected?(<div id="asset-detail" className="asset-detail-page">
+          <button type="button" className="back-link" onClick={closeDetail}><span aria-hidden="true">←</span> Back to explore assets</button>
+          <div className="asset-detail">
+            <div className="asset-detail-head"><div className={"coin "+selected.color} aria-hidden="true">{selected.initial}</div><div><h2 id="asset-detail-title" ref={detailHeading} tabIndex={-1}>{selected.name}</h2><div className="symbol">{selected.symbol} · {selected.category}</div></div><span className="badge">{tagLabel(selected.tag)}</span></div>
+            <dl className="detail-stats"><div><dt>Sample price</dt><dd>{selected.priceLabel}</dd></div><div><dt>Sample market cap</dt><dd>{selected.marketCapLabel}</dd></div><div><dt>Category</dt><dd>{selected.category}</dd></div><div><dt>Listing</dt><dd>{tagLabel(selected.tag)}</dd></div></dl>
+            <div className="detail-about"><h3>About this listing</h3><p>{selected.description}</p></div>
+            <div className="notice">Listing metrics are illustrative only — no live chain data is connected. Trading is disabled in this preview.</div>
+            <button className="btn" type="button" style={{width:"100%"}} onClick={closeDetail}>Back to catalog</button>
+          </div>
+        </div>):(<>
         <div className="sectionhead"><div><div className="eyebrow">Community marketplace</div><h2>Explore assets</h2><p>Browse sample listings to preview the discovery experience.</p></div>
           <div className="tabs" role="group" aria-label="Filter assets">{filters.map(f=><button key={f.value} className={"tab"+(filter===f.value?" active":"")} type="button" aria-pressed={filter===f.value} onClick={()=>setFilter(f.value)}>{f.label}</button>)}</div>
         </div>
@@ -121,9 +160,10 @@ export default function App(){
         <div className="token-grid">{visible.map(a=><article className="token" key={a.id}>
           <div className="token-top"><div className={"coin "+a.color} aria-hidden="true">{a.initial}</div><div><h3>{a.name}</h3><div className="symbol">{a.symbol} · {a.category}</div></div><span className="badge">{tagLabel(a.tag)}</span></div>
           <p className="desc">{a.description}</p><div className="nums"><div><label>Sample price</label><strong>{a.priceLabel}</strong></div><div><label>Sample market cap</label><strong>{a.marketCapLabel}</strong></div></div>
-          <div className="tokenbottom"><button className="btn" type="button" onClick={()=>{setSelected(a);setDialog("asset");}}>View details</button><button className="btn ghost" type="button" onClick={()=>setNotice("Trading is disabled in this preview. Sample market data is for interface demonstration only.")}>Trade · Demo</button></div>
+          <div className="tokenbottom"><button className="btn" type="button" data-detail-trigger={a.id} onClick={()=>openDetail(a)}>View details</button><button className="btn ghost" type="button" onClick={()=>setNotice("Trading is disabled in this preview. Sample market data is for interface demonstration only.")}>Trade · Demo</button></div>
         </article>)}</div>
         {visible.length===0&&<div className="empty"><div><strong>No matching assets</strong><p>Try a different name or symbol, or reset your search and filters.</p></div><button className="btn" type="button" onClick={resetSearchAndFilters}>Reset search and filters</button></div>}
+        </>)}
       </section>
       <section className="launch" id="launch"><div className="launch-intro"><div className="eyebrow">Creator tools</div><h2>Build something worth discovering.</h2><p>Configure an initial token launch draft, review your project parameters, and prepare it for a future testnet integration. Drafts stay in this browser session.</p><div className="pillrow"><span className="pill">Parameter validation</span><span className="pill">Draft review</span><span className="pill">No live transactions</span></div></div>
         <div className="launch-card">
@@ -152,15 +192,6 @@ export default function App(){
       <button className="walletopt" type="button" onClick={()=>setWalletNotice("MetaMask is shown as a UI preview only. No wallet provider is installed or contacted.")}><span className="walleticon" aria-hidden="true">M</span><span><strong>MetaMask</strong><span className="symbol">Browser wallet · Not connected</span></span></button>
       <button className="walletopt" type="button" onClick={()=>setWalletNotice("WalletConnect is shown as a UI preview only. No wallet provider is installed or contacted.")}><span className="walleticon" aria-hidden="true">W</span><span><strong>WalletConnect</strong><span className="symbol">Mobile wallet · Not configured</span></span></button>
       <div className="notice" role="status" aria-live="polite">{walletNotice}</div>
-    </Dialog>
-    <Dialog open={dialog==="asset"} title={selected?selected.name:"Asset details"} titleId="assetTitle" onClose={closeDialog}>
-      {selected&&<div className="asset-detail">
-        <div className="asset-detail-head"><div className={"coin "+selected.color} aria-hidden="true">{selected.initial}</div><div><h3>{selected.name}</h3><div className="symbol">{selected.symbol} · {selected.category}</div></div><span className="badge">{tagLabel(selected.tag)}</span></div>
-        <dl className="detail-stats"><div><dt>Sample price</dt><dd>{selected.priceLabel}</dd></div><div><dt>Sample market cap</dt><dd>{selected.marketCapLabel}</dd></div><div><dt>Category</dt><dd>{selected.category}</dd></div><div><dt>Listing</dt><dd>{tagLabel(selected.tag)}</dd></div></dl>
-        <div className="detail-about"><h3>About this listing</h3><p>{selected.description}</p></div>
-        <div className="notice">Listing metrics are illustrative only — no live chain data is connected. Trading is disabled in this preview.</div>
-        <button className="btn" type="button" style={{width:"100%",marginTop:14}} onClick={closeDialog}>Back to catalog</button>
-      </div>}
     </Dialog>
   </>;
 }

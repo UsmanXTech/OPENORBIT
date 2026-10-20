@@ -10,20 +10,37 @@ describe("OPENORBIT marketplace preview",()=>{
   expect(screen.getByText("Lumen Protocol")).toBeInTheDocument();
   expect(screen.getByText(/Preview mode: market figures are sample data/)).toBeInTheDocument();
  });
- it("shows a structured asset detail view with sample-labeled stats",async()=>{
+ it("shows the asset detail as an inline page with sample-labeled stats",async()=>{
   const user=userEvent.setup(); render(<App />);
   await user.click(screen.getAllByRole("button",{name:"View details"})[0]);
-  const dialog=screen.getByRole("dialog",{name:"Lumen Protocol"});
-  expect(within(dialog).getByText("Sample price")).toBeInTheDocument();
-  expect(within(dialog).getByText("Sample market cap")).toBeInTheDocument();
-  expect(within(dialog).getByText("About this listing")).toBeInTheDocument();
-  expect(within(dialog).getByText(/Listing metrics are illustrative only/)).toBeInTheDocument();
- });
- it("closes the asset detail dialog from its action button",async()=>{
-  const user=userEvent.setup(); render(<App />);
-  await user.click(screen.getAllByRole("button",{name:"View details"})[0]);
-  await user.click(screen.getByRole("button",{name:"Back to catalog"}));
   expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  const heading=screen.getByRole("heading",{name:"Lumen Protocol"});
+  expect(heading).toHaveFocus();
+  expect(screen.getByRole("button",{name:/Back to explore assets/})).toBeInTheDocument();
+  expect(screen.getByText("Sample price")).toBeInTheDocument();
+  expect(screen.getByText("Sample market cap")).toBeInTheDocument();
+  expect(screen.getByText("About this listing")).toBeInTheDocument();
+  expect(screen.getByText(/Listing metrics are illustrative only/)).toBeInTheDocument();
+  expect(screen.queryByRole("button",{name:"View details"})).not.toBeInTheDocument();
+ });
+ it("returns to the catalog and restores focus to the triggering button",async()=>{
+  const user=userEvent.setup(); render(<App />);
+  const trigger=screen.getAllByRole("button",{name:"View details"})[0];
+  await user.click(trigger);
+  await user.click(screen.getByRole("button",{name:"Back to catalog"}));
+  expect(screen.queryByText("About this listing")).not.toBeInTheDocument();
+  const triggers=screen.getAllByRole("button",{name:"View details"});
+  expect(triggers.length).toBeGreaterThan(0);
+  expect(triggers[0]).toHaveFocus();
+ });
+ it("closes the asset detail view with Escape",async()=>{
+  const user=userEvent.setup(); render(<App />);
+  await user.click(screen.getAllByRole("button",{name:"View details"})[0]);
+  expect(screen.getByRole("heading",{name:"Lumen Protocol"})).toBeInTheDocument();
+  await user.keyboard("{Escape}");
+  expect(screen.queryByText("About this listing")).not.toBeInTheDocument();
+  expect(screen.queryByRole("button",{name:/Back to explore assets/})).not.toBeInTheDocument();
+  expect(screen.getAllByRole("button",{name:"View details"}).length).toBeGreaterThan(0);
  });
  it("filters assets by name or symbol",async()=>{
   const user=userEvent.setup(); render(<App />);
