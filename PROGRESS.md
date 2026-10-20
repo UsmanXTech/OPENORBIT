@@ -1,5 +1,35 @@
 # Engineering progress
 
+## 2026-10-20 — Launch-view density polish (proportional form columns, card header, button geometry in CSS)
+
+- Starting state: `main` at `cfec9e7` (verified with `git fetch origin` + `git log --oneline -3 origin/main`); working tree clean; no open PRs; latest CI on main green.
+- This hour's highest-value improvement (the queued "Launch-view density polish" item from run #14): the Launch form card now has a proper header — an `h3` "Draft settings" title above the preview-only note, establishing the title 14px > field-label 12px > input-text 12px hierarchy — and the name/symbol row uses proportional columns (2fr/1fr) instead of equal 1fr/1fr, so the short symbol field (max 10 chars) no longer looks unfinished next to the 40-char name field; grid gap tightened 12px→10px and grid margin 14px→12px to remove dead space inside the no-scroll shell. All three inline `style={width:"100%"}` occurrences (Review draft, Edit draft) moved into CSS as a `.btn-block` class — button geometry now lives in the stylesheet. No behavior change: validation, error summary, focus-to-field, aria wiring, DOM order, and the no-scroll layout are untouched.
+- Research (mandatory per-component; UI_UX_RESEARCH.md §37–38, both read directly this run): Carbon Form usage — proportional two-column rows, label-above-input, minority-only "(optional)" marking, helper text replaced by error text; its 32px vertical spacing NOT transferred (would overflow the 100dvh shell — documented exception). Adobe Spectrum Text field (Spectrum Hub; reached via the site's own search after the legacy /page/text-fields/ and /page/form/ URLs 404'd on the redesign) — top labels default/recommended, 1.5×-height minimum field width (the narrowed symbol column clears it ~2.2×), error text as 1–2 short complete sentences ending in periods (matches our copy), no filler help text for layout continuity. Side labels rejected per Spectrum (harm reflow/localization); Spectrum's S/M/L/XL scale not adopted (one consistent field size).
+
+### Verification (real runs, Node)
+
+- `npm run typecheck`: passed (`tsc --noEmit`, no errors).
+- `npm test`: 41/41 passed (39 existing + 2 new: card `h3` "Draft settings" renders below the view h2 without duplicating/outranking it; Review draft and Edit draft buttons carry `btn-block` and no inline `style` attribute).
+- `npm run build`: passed (production bundle built to `dist/`).
+
+### Files changed
+
+- `src/App.tsx` — `h3.launch-card-title` "Draft settings" added at the top of `.launch-card`; symbol field-group gets `field-short` class (hook for future refinements; the proportions come from the grid); inline styles removed from "Review draft" and "Edit draft" buttons in favor of `btn-block`.
+- `src/styles.css` — `.launch-card-title` (14px/750); `.formgrid` grid columns `1fr 1fr` → `2fr 1fr` (proportional; full rows still span via `.full`), gap 12px → 10px, margin 14px → 12px; `.formgrid label` 11px → 12px; new `.btn-block { display:block; width:100% }` + `.draft-result .btn-block { margin-top:12px }`. The existing ≤680px media query still collapses `.formgrid` to one column, so proportional columns never squeeze a field on mobile.
+- `src/App.test.tsx` — 2 new tests (card title anatomy; button geometry in CSS).
+- `UI_UX_RESEARCH.md` — sessions 37–38 (mandatory per-component research) with the two direct reads and their transfer/not-transfer notes.
+- `PROGRESS.md` — this entry.
+
+### Next
+
+- Verify CI on the promoted commit. Next UX candidates: Wallet status-list density alignment with the new guide task-list row rhythm; then Explore toolbar field-sizing consistency pass (both within the no-scroll shell).
+
+### Promotion
+
+- Direct commit pushed to `main` after a fresh fetch; tree clean, no concurrent work, no open PRs, no branch protections bypassed.
+- CI: [filled after run observed].
+- Vercel: not touched (read-only; auto-deploys on Vercel's side).
+
 ## 2026-10-20 — Guide steps become an actionable task list (whole-row navigation)
 
 - Starting state: `main` at `ac113d7` (verified with `git fetch origin` + `git log --oneline -3 origin/main`); working tree clean; no open PRs; latest CI on main green.

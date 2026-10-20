@@ -145,6 +145,28 @@ describe("OPENORBIT marketplace preview",()=>{
   expect(screen.getByText("Draft ready for review")).toBeInTheDocument();
   expect(screen.getByText(/No contract has been generated or deployed/)).toBeInTheDocument();
  });
+ it("gives the form card its own title below the view heading",async()=>{
+  const user=userEvent.setup(); render(<App />);
+  await user.click(screen.getByRole("tab",{name:"Launch"}));
+  const title=screen.getByRole("heading",{name:"Draft settings",level:3});
+  expect(title).toBeInTheDocument();
+  // The card title must not outrank or duplicate the view's h2.
+  expect(title.compareDocumentPosition(screen.getByRole("heading",{name:"Create launch draft"})) & Node.DOCUMENT_POSITION_PRECEDING).toBeTruthy();
+ });
+ it("keeps form action buttons' geometry in CSS, not inline styles",async()=>{
+  const user=userEvent.setup(); render(<App />);
+  await user.click(screen.getByRole("tab",{name:"Launch"}));
+  const submit=screen.getByRole("button",{name:"Review draft"});
+  expect(submit).not.toHaveAttribute("style");
+  expect(submit).toHaveClass("btn-block");
+  await user.type(screen.getByRole("textbox",{name:"Token name"}),"Open Orbit");
+  await user.type(screen.getByRole("textbox",{name:"Token symbol"}),"orbt");
+  await user.type(screen.getByRole("spinbutton",{name:"Total supply"}),"1000000");
+  await user.click(submit);
+  const editDraft=screen.getByRole("button",{name:"Edit draft"});
+  expect(editDraft).not.toHaveAttribute("style");
+  expect(editDraft).toHaveClass("btn-block");
+ });
  it("rejects a supply above the documented maximum",async()=>{
   const user=userEvent.setup(); render(<App />);
   await user.click(screen.getByRole("tab",{name:"Launch"}));

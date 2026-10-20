@@ -720,6 +720,7 @@ export default function App() {
                 </div>
               </div>
               <div className="launch-card">
+                <h3 className="launch-card-title">Draft settings</h3>
                 <p className="launch-card-sub">
                   Draft settings are for preview only and are not submitted to a
                   blockchain.
@@ -756,7 +757,7 @@ export default function App() {
                         </span>
                       )}
                     </div>
-                    <div className="field-group">
+                    <div className="field-group field-short">
                       <label htmlFor="token-symbol">Token symbol</label>
                       <input
                         id="token-symbol"
@@ -835,11 +836,7 @@ export default function App() {
                       />
                     </div>
                   </div>
-                  <button
-                    className="btn primary"
-                    type="submit"
-                    style={{ width: "100%" }}
-                  >
+                  <button className="btn btn-block primary" type="submit">
                     Review draft
                   </button>
                 </form>
@@ -856,9 +853,8 @@ export default function App() {
                       deployed.
                     </div>
                     <button
-                      className="btn"
+                      className="btn btn-block"
                       type="button"
-                      style={{ width: "100%", marginTop: 12 }}
                       onClick={() => setResult(null)}
                     >
                       Edit draft

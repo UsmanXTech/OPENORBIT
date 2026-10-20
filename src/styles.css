@@ -87,6 +87,10 @@ h2, h3 { letter-spacing: -.045em; }
 .btn:hover { transform: translateY(-1px); border-color: #bcb6d9; box-shadow: 0 5px 14px rgba(25, 26, 34, .06); }
 .btn.primary { border-color: var(--accent); background: var(--accent); color: white; box-shadow: 0 5px 12px rgba(107, 78, 255, .16); }
 .btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+/* Full-width action buttons (form submit / result actions) — replaces the
+   removed inline style={width:"100%"} so button geometry lives in CSS. */
+.btn-block { display: block; width: 100%; }
+.draft-result .btn-block { margin-top: 12px; }
 .btn.ghost { background: transparent; border-color: transparent; }
 .btn.ghost:hover { background: var(--accent-soft); border-color: transparent; box-shadow: none; }
 .btn.sm { padding: 7px 11px; font-size: 11px; border-radius: 9px; }
@@ -223,10 +227,16 @@ h2, h3 { letter-spacing: -.045em; }
 .pillrow { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 16px; }
 .pill { border: 1px solid var(--border-strong); border-radius: 999px; padding: 6px 10px; color: var(--muted); background: var(--surface); font-size: 10px; font-weight: 650; }
 .launch-card { padding: 22px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface); box-shadow: var(--shadow-card); align-self: start; }
+/* Card header: short title + honesty note, then the form — the label hierarchy
+   (title 14px > field labels 12px) follows the Carbon form-guidance pattern. */
+.launch-card-title { margin: 0 0 2px; font-size: 14px; font-weight: 750; letter-spacing: -.01em; }
 .launch-card-sub { margin: 0 0 4px; color: var(--muted); font-size: 12px; line-height: 1.6; }
 .field-group { min-width: 0; }
-.formgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 14px 0; }
-.formgrid label { display: block; color: #4f505b; font-size: 11px; font-weight: 700; }
+/* Proportional two-column row: the name field takes the wide column and the
+   short symbol field the narrow one, so each field's width matches the data
+   it collects (Adobe form-elements guidance). Full rows still span both. */
+.formgrid { display: grid; grid-template-columns: 2fr 1fr; gap: 10px; margin: 12px 0; }
+.formgrid label { display: block; color: #4f505b; font-size: 12px; font-weight: 700; }
 .formgrid input { display: block; width: 100%; min-width: 0; margin-top: 6px; padding: 10px 11px; border: 1px solid var(--border-strong); border-radius: 9px; background: white; color: var(--text); font-size: 12px; }
 .formgrid input:focus { border-color: var(--accent); }
 .formgrid input[aria-invalid="true"] { border-color: var(--danger); background: #fffafb; }
