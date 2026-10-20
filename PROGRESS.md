@@ -26,7 +26,7 @@
 
 ### Promotion
 
-- PENDING: direct commit to `main` after a fresh fetch; CI to be verified.
+- Direct commit `d169cff` pushed to `main` (`88f52f3..d169cff`) after a fresh fetch (tree clean, no concurrent work, no open PRs); CI run to be verified; Vercel not touched (read-only).
 
 ## 2026-10-20 — Wallet status-list density + Explore toolbar field-sizing consistency (run #16)
 
