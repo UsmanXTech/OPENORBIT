@@ -185,18 +185,24 @@ describe("OPENORBIT marketplace preview",()=>{
   expect(name).not.toHaveAttribute("aria-describedby");
   expect(screen.queryByText("Enter a token name.")).not.toBeInTheDocument();
  });
- it("keeps wallet integration in preview mode via the Wallet view, not a dialog",async()=>{
+ it("reports honest wallet connection status via the Wallet view, not a dialog",async()=>{
   const user=userEvent.setup(); render(<App />);
   expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-  await user.click(screen.getByRole("button",{name:"Connect wallet"}));
+  await user.click(screen.getByRole("button",{name:"Wallet"}));
   expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-  const heading=screen.getByRole("heading",{name:"Connect wallet"});
+  const heading=screen.getByRole("heading",{name:"Connection status"});
   await waitFor(()=>expect(heading).toHaveFocus());
-  expect(screen.getByText("No connection request will be sent.")).toBeInTheDocument();
-  await user.click(screen.getByRole("button",{name:/^MetaMask/}));
-  expect(screen.getByText(/No wallet provider is installed or contacted/)).toBeInTheDocument();
+  expect(screen.getByText(/This preview is not connected to any wallet or blockchain/)).toBeInTheDocument();
+  const list=screen.getByRole("list");
+  expect(within(list).getAllByRole("listitem")).toHaveLength(5);
+  expect(within(list).getByText("Not connected")).toBeInTheDocument();
+  expect(within(list).getAllByText("Planned")).toHaveLength(2);
+  expect(within(list).getByText("Not configured")).toBeInTheDocument();
+  expect(within(list).getByText("Not handled")).toBeInTheDocument();
+  expect(screen.getByText(/No connection request will be sent/)).toBeInTheDocument();
+  expect(screen.queryByText("Connect wallet")).not.toBeInTheDocument();
   await user.click(screen.getByRole("tab",{name:"Explore"}));
-  expect(screen.queryByRole("heading",{name:"Connect wallet"})).not.toBeInTheDocument();
+  expect(screen.queryByRole("heading",{name:"Connection status"})).not.toBeInTheDocument();
   expect(screen.getByRole("heading",{name:"Explore assets"})).toBeInTheDocument();
  });
 });

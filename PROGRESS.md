@@ -1,6 +1,33 @@
 # Engineering progress
 
-## 2026-10-20 — Launch error-summary upgrade: above-the-form placement + focus-moving links
+## 2026-10-20 — Wallet honest-status redesign: connection-status report replaces fake connect buttons
+
+- Starting state: `main` at `700f9cf` (verified with `git fetch origin` + `git log --oneline -3 origin/main`); working tree clean; no open PRs; latest CI on main green.
+- This hour's highest-value improvement: the Wallet view is now a "Connection status" report instead of a fake "Connect wallet" page. The two provider buttons (MetaMask/WalletConnect) — which did nothing real and only updated a status note — are gone, and the header button is renamed from "Connect wallet" to "Wallet" since nothing ever connects. The view now lists five integration components (Wallet provider, MetaMask, WalletConnect, Network, Private keys) as rows with subtle Atlassian-style status lozenges — "Not connected", "Planned" ×2, "Not configured", "Not handled" — each with a one-line honest detail, plus a fixed `role="status"` notice: "No connection request will be sent. Real connections would require provider integration, chain configuration, and a security review — none of which this preview performs."
+- Research (mandatory per-component; UI_UX_RESEARCH.md §30–31): Atlassian Statuspage component status list (support page opened directly) — component rows with status lozenges, text-labeled indicators, report-what-is-true-not-actions; operational vocabulary deliberately NOT transferred (a demo has no uptime to report). GitHub Docs "Reviewing your authorized OAuth apps" (search excerpts; its empty-state wording not visible — documented as a limitation, pattern only) — the review-list-of-actual-authorizations framing.
+- Accessibility: states are never color-only (lozenge text carries meaning); rows are plain list items with no new keyboard contract; the view contains no form at all (Rule 1 trivially satisfied); heading focus management unchanged (`tabIndex={-1}` + focus on view activation).
+
+### Verification (real runs, Node)
+
+- `npm run typecheck`: passed (`tsc --noEmit`, no errors).
+- `npm test`: 33/33 passed (15 app — wallet test rewritten for the status-list design — + 6 sort + 4 search + 5 no-scroll invariants).
+- `npm run build`: passed (production bundle built to `dist/`).
+- Mid-run tooling incident: two `muse.edit` calls corrupted the module header of `src/App.tsx` (duplicated state declarations, lost `views` array close). Caught by `npm run typecheck` (TS2451 redeclare errors), repaired with a surgical rewrite of the header block, re-verified green. No other files were affected.
+
+### Files changed
+
+- `src/App.tsx` — removed `walletNotice` state + provider buttons; added module-level `walletStatuses` data; Wallet view now renders the status list with lozenges; header button renamed to "Wallet" (plain tab activation).
+- `src/styles.css` — replaced `.wallet-grid`/`.walletopt`/`.walleticon` with `.status-list`/`.status-row`/`.lozenge` (muted + planned tones); short-viewport density adjustments updated.
+- `src/App.test.tsx` — wallet test rewritten: status list has 5 rows, honest states present, no "Connect wallet" affordance anywhere, heading focus + tab-switch behavior.
+- `UI_UX_RESEARCH.md` — sessions 30–31 (mandatory per-component research).
+
+### Next
+
+- Verify CI on the promoted commit. Next UX candidate: Guide view content density or Explore empty-state copy review — both within the no-scroll shell.
+
+### Promotion
+
+- (to be filled after promotion)
 
 - Starting state: `main` at `310f188` (verified with `git fetch origin` + `git log --oneline -3 origin/main`); working tree clean; no open PRs; latest CI on main green.
 - This hour's highest-value improvement: the Launch draft form's error summary now follows the GOV.UK error-summary pattern — it renders ABOVE the form fields (previously it sat below them, just before the submit button), and each summary link now moves keyboard focus to its field explicitly via the field refs. The old plain `href="#id"` anchors could not reliably do this in the no-scroll shell; the links keep their `href`s for semantics but their click handlers `preventDefault()` and focus the input. First-invalid-field focus on submit is unchanged (tested contract), so no behavior regresses; the summary's wording still matches the inline errors verbatim per the GOV.UK rule, `role="alert"` is preserved, and `aria-invalid`/`aria-describedby` associations are untouched.

@@ -33,6 +33,17 @@ const sortLabels: Record<SortColumn, string> = {
   cap: "Sample market cap",
 };
 
+// Wallet integration states: the demo performs no connection, so the
+// Wallet view reports the honest state of each component (Statuspage
+// pattern) instead of offering fake "connect" buttons.
+const walletStatuses: { name: string; status: string; tone: "muted" | "planned"; detail: string }[] = [
+  { name: "Wallet provider", status: "Not connected", tone: "muted", detail: "No wallet provider is installed or contacted in this preview." },
+  { name: "MetaMask", status: "Planned", tone: "planned", detail: "Listed for UI reference only — integration is not implemented." },
+  { name: "WalletConnect", status: "Planned", tone: "planned", detail: "Listed for UI reference only — integration is not implemented." },
+  { name: "Network", status: "Not configured", tone: "muted", detail: "No blockchain network is configured." },
+  { name: "Private keys", status: "Not handled", tone: "muted", detail: "This preview never requests or stores private keys." },
+];
+
 export default function App() {
   const [view, setView] = useState<View>("explore");
   const [announcement, setAnnouncement] = useState("");
@@ -42,7 +53,6 @@ export default function App() {
   const [sortDir, setSortDir] = useState<AssetSortDir>("desc");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [returnToId, setReturnToId] = useState<string | null>(null);
-  const [walletNotice, setWalletNotice] = useState("No connection request will be sent.");
   const [notice, setNotice] = useState("");
   const [draftErrors, setDraftErrors] = useState({ name: "", symbol: "", supply: "" });
   const [result, setResult] = useState<LaunchDraft | null>(null);
@@ -51,7 +61,6 @@ export default function App() {
   const nameInput = useRef<HTMLInputElement>(null);
   const symbolInput = useRef<HTMLInputElement>(null);
   const supplyInput = useRef<HTMLInputElement>(null);
-  const connectBtn = useRef<HTMLButtonElement>(null);
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const segRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const headingRefs = useRef<Record<View, HTMLHeadingElement | null>>({
@@ -343,15 +352,11 @@ export default function App() {
               Preview mode
             </span>
             <button
-              ref={connectBtn}
               className="btn primary"
               type="button"
-              onClick={() => {
-                setWalletNotice("No connection request will be sent.");
-                activate("wallet", true);
-              }}
+              onClick={() => activate("wallet", true)}
             >
-              Connect wallet
+              Wallet
             </button>
           </div>
         </div>
@@ -813,55 +818,30 @@ export default function App() {
                 }}
                 tabIndex={-1}
               >
-                Connect wallet
+                Connection status
               </h2>
               <p className="wallet-copy">
-                Wallet providers are not configured in this preview. The options
-                below show the intended integration state — selecting one only
-                updates the status note; no connection request is sent.
+                This preview is not connected to any wallet or blockchain.
+                Each integration below shows its real state — nothing on this
+                page sends a connection request.
               </p>
-              <div className="wallet-grid">
-                <button
-                  className="walletopt"
-                  type="button"
-                  onClick={() =>
-                    setWalletNotice(
-                      "MetaMask is shown as a UI preview only. No wallet provider is installed or contacted."
-                    )
-                  }
-                >
-                  <span className="walleticon" aria-hidden="true">
-                    M
-                  </span>
-                  <span>
-                    <strong>MetaMask</strong>
-                    <span className="symbol">
-                      Browser wallet · Not connected
+              <ul className="status-list">
+                {walletStatuses.map((row) => (
+                  <li key={row.name} className="status-row">
+                    <div className="status-main">
+                      <strong>{row.name}</strong>
+                      <span className="status-detail">{row.detail}</span>
+                    </div>
+                    <span className={"lozenge lozenge-" + row.tone}>
+                      {row.status}
                     </span>
-                  </span>
-                </button>
-                <button
-                  className="walletopt"
-                  type="button"
-                  onClick={() =>
-                    setWalletNotice(
-                      "WalletConnect is shown as a UI preview only. No wallet provider is installed or contacted."
-                    )
-                  }
-                >
-                  <span className="walleticon" aria-hidden="true">
-                    W
-                  </span>
-                  <span>
-                    <strong>WalletConnect</strong>
-                    <span className="symbol">
-                      Mobile wallet · Not configured
-                    </span>
-                  </span>
-                </button>
-              </div>
+                  </li>
+                ))}
+              </ul>
               <div className="notice" role="status" aria-live="polite">
-                {walletNotice}
+                No connection request will be sent. Real connections would
+                require provider integration, chain configuration, and a
+                security review — none of which this preview performs.
               </div>
             </div>
           </section>
