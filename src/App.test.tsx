@@ -287,4 +287,42 @@ describe("OPENORBIT marketplace preview",()=>{
   await user.click(screen.getByRole("button",{name:"Trending"}));
   expect(toolbar?.querySelector(".reset-controls")).not.toBeNull();
  });
+ it("renders the draft review as a labeled key/value summary, not a run-on sentence",async()=>{
+  const user=userEvent.setup(); render(<App />);
+  await user.click(screen.getByRole("tab",{name:"Launch"}));
+  await waitFor(()=>expect(screen.getByRole("heading",{name:"Create launch draft"})).toHaveFocus());
+  await user.type(screen.getByRole("textbox",{name:"Token name"}),"Open Orbit");
+  await user.type(screen.getByRole("textbox",{name:"Token symbol"}),"orbt");
+  await user.type(screen.getByRole("spinbutton",{name:"Total supply"}),"1000000");
+  await user.click(screen.getByRole("button",{name:"Review draft"}));
+  const summary=document.querySelector("dl.draft-summary");
+  expect(summary).not.toBeNull();
+  expect(within(summary as HTMLElement).getByText("Token name").tagName).toBe("DT");
+  expect(within(summary as HTMLElement).getByText("Open Orbit").tagName).toBe("DD");
+  expect(within(summary as HTMLElement).getByText("Symbol").tagName).toBe("DT");
+  expect(within(summary as HTMLElement).getByText("ORBT").tagName).toBe("DD");
+  expect(within(summary as HTMLElement).getByText("Total supply").tagName).toBe("DT");
+  expect(within(summary as HTMLElement).getByText("1,000,000").tagName).toBe("DD");
+  // the old run-on sentence format ("Name (SYMBOL) · Total supply: ...") is gone
+  expect(screen.queryByText(/Total supply:/)).not.toBeInTheDocument();
+  expect(screen.queryByText(/Open Orbit \(orbt\)/)).not.toBeInTheDocument();
+ });
+ it("shows the draft-summary Description row only when a description was entered",async()=>{
+  const user=userEvent.setup(); render(<App />);
+  await user.click(screen.getByRole("tab",{name:"Launch"}));
+  await waitFor(()=>expect(screen.getByRole("heading",{name:"Create launch draft"})).toHaveFocus());
+  await user.type(screen.getByRole("textbox",{name:"Token name"}),"Open Orbit");
+  await user.type(screen.getByRole("textbox",{name:"Token symbol"}),"orbt");
+  await user.type(screen.getByRole("spinbutton",{name:"Total supply"}),"1000000");
+  await user.type(screen.getByRole("textbox",{name:/Description/}),"A community demo token");
+  await user.click(screen.getByRole("button",{name:"Review draft"}));
+  const summary=document.querySelector("dl.draft-summary");
+  expect(within(summary as HTMLElement).getByText("Description").tagName).toBe("DT");
+  expect(within(summary as HTMLElement).getByText("A community demo token").tagName).toBe("DD");
+  await user.click(screen.getByRole("button",{name:"Edit draft"}));
+  await user.clear(screen.getByRole("textbox",{name:/Description/}));
+  await user.click(screen.getByRole("button",{name:"Review draft"}));
+  expect(screen.getByText("Draft ready for review")).toBeInTheDocument();
+  expect(screen.queryByRole("term",{name:"Description"})).not.toBeInTheDocument();
+ });
 });

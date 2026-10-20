@@ -257,7 +257,13 @@ h2, h3 { letter-spacing: -.045em; }
 .error-summary-list a:focus-visible { outline: 3px solid #8b78ff; outline-offset: 2px; }
 .draft-result { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border); }
 .draft-result h3 { font-size: 16px; margin: 0 0 6px; }
-.draft-result p { margin: 0; color: var(--muted); font-size: 12px; }
+/* Draft-review summary: GOV.UK summary-list / PatternFly description-list
+   pattern — key/value rows with dividers instead of a run-on sentence.
+   Terms stack above values (PatternFly default): dense, narrow-card safe. */
+.draft-summary { margin: 10px 0 0; border-top: 1px solid var(--border); }
+.draft-row { display: grid; gap: 2px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.draft-row dt { font-size: 12px; font-weight: 600; color: var(--muted); }
+.draft-row dd { margin: 0; font-size: 13px; font-weight: 650; color: var(--text); overflow-wrap: anywhere; }
 .draft-result .notice { margin-top: 12px; }
 
 /* ---- Wallet view ---- */

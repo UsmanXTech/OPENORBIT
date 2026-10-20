@@ -843,11 +843,26 @@ export default function App() {
                 {result && (
                   <div className="draft-result" aria-live="polite">
                     <h3>Draft ready for review</h3>
-                    <p>
-                      {result.name} ({result.symbol}) · Total supply:{" "}
-                      {result.supply.toLocaleString()}
-                      {result.description ? " · " + result.description : ""}
-                    </p>
+                    <dl className="draft-summary">
+                      <div className="draft-row">
+                        <dt>Token name</dt>
+                        <dd>{result.name}</dd>
+                      </div>
+                      <div className="draft-row">
+                        <dt>Symbol</dt>
+                        <dd>{result.symbol}</dd>
+                      </div>
+                      <div className="draft-row">
+                        <dt>Total supply</dt>
+                        <dd>{result.supply.toLocaleString()}</dd>
+                      </div>
+                      {result.description ? (
+                        <div className="draft-row">
+                          <dt>Description</dt>
+                          <dd>{result.description}</dd>
+                        </div>
+                      ) : null}
+                    </dl>
                     <div className="notice">
                       Saved in this page only. No contract has been generated or
                       deployed.

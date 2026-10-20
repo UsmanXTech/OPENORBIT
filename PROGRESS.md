@@ -1,3 +1,33 @@
+## 2026-10-20 — Launch draft-review card typography: key/value summary rows (run #18)
+
+- Starting state: `main` at `88f52f3` (verified with `git fetch origin` + `git log --oneline -3 origin/main`); working tree clean; no open PRs; latest CI on main green.
+- This hour's highest-value improvement (the queued "Launch-view draft-review card typography" item from run #17): the "Draft ready for review" card no longer renders the draft as a run-on sentence ("Open Orbit (ORBT) · Total supply: 1,000,000 · …") — it now uses a structured `<dl class="draft-summary">` with one key/value row per field (Token name / Symbol / Total supply / Description), hairline dividers between rows, PatternFly-style vertical stacking (term above description, the density-safe choice in a narrow card), a 12px/600/--muted label tier and a 13px/650/--text value tier (sentence-case, consistent with the run-#17 ladder). The Description row renders only when a description was entered. No behavior change: review flow, validation, aria-live="polite", Edit draft, notice copy, DOM order, and the no-scroll layout are untouched.
+- Research (mandatory per-component; UI_UX_RESEARCH.md §42, both read directly this run): GOV.UK Design System Summary list (dl/dt/dd check-answers rows with dividers, for summarizing form responses — exactly this card's job) + PatternFly Description list (default term-above-description stacking; horizontal layout reserved for wide screens; label subordinate to value). Not transferred: per-row "Change" links (the single Edit draft button is the change action), horizontal/column layouts (no width in a no-scroll card), popovers, the summary-card variant.
+- Accessibility fix inherited by design: labels use --muted (#696b75, ≈5.4:1 on white — AA pass at 12px, the same token run #17 fixed) with weight also carrying the key/value distinction; native dl association needs no aria wiring; long descriptions get overflow-wrap: anywhere.
+
+### Verification (real runs, Node)
+
+- `npm run typecheck`: passed (`tsc --noEmit`, no errors).
+- `npm test`: 45/45 passed (43 existing + 2 new: draft review renders a dl key/value summary with dt/dd pairs and the old run-on sentence format is gone; Description row appears only when a description was entered). One iteration of the first new test failed on my own expectation — the app uppercases the symbol on review (ORBT, existing behavior) — corrected, no app change.
+- `npm run build`: passed (production bundle built to `dist/`).
+- `npx vitest run src/noscroll.test.ts`: 5/5 passed (Hard Design Rule 2 CSS invariants hold; the card lives inside the launch grid's documented last-resort internal scroll region).
+
+### Files changed
+
+- `src/App.tsx` — the draft-result summary paragraph replaced with `dl.draft-summary` / `dt` / `dd` rows (name, symbol, supply; description conditional).
+- `src/styles.css` — `.draft-summary` (divider-framed list), `.draft-row` (8px vertical padding, hairline dividers, term-above-value stack), `dt` 12px/600/--muted, `dd` 13px/650/--text with overflow-wrap: anywhere; the old `.draft-result p` rule removed.
+- `src/App.test.tsx` — 2 new tests (summary structure contract; conditional Description row).
+- `UI_UX_RESEARCH.md` — session 42 (mandatory per-component research) + honest-limitations note.
+- `PROGRESS.md` — this entry.
+
+### Next
+
+- Verify CI on the promoted commit. Next UX candidates: Explore empty-state copy/density pass; then the no-scroll live-geometry audit follow-ups (both within the no-scroll shell).
+
+### Promotion
+
+- PENDING: direct commit to `main` after a fresh fetch; CI to be verified.
+
 ## 2026-10-20 — Wallet status-list density + Explore toolbar field-sizing consistency (run #16)
 
 - Starting state: `main` at `7f0fb34` (verified with `git fetch origin` + `git log --oneline -3 origin/main`); working tree clean; no open PRs; latest CI on main green.
