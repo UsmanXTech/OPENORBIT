@@ -10,7 +10,7 @@ The frontend has been migrated from a single-file HTML prototype to a React + Ty
 
 - Responsive marketplace layout and sample asset cards
 - Search, category filters, and sorting
-- Asset details, wallet-preview, and launch-draft dialogs
+- Asset details and wallet-preview dialogs (informational only); the launch-draft form renders as a full inline page section, never a dialog
 - Keyboard Escape handling, focus cycling, focus restoration, and visible focus states
 - Client-side validation for launch-draft fields
 - Unit tests for core preview interactions

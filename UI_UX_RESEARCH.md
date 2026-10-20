@@ -139,3 +139,23 @@ The launch-draft form previously returned one generic error for three different 
    - What does not transfer: live price charts, transactions, pools, swap/buy CTAs, branding, or any implication that OPENORBIT has real market data.
    - Why it suits OPENORBIT: a catalog detail view benefits from quick-scan stats plus an about section — it matches the discovery mental model of a real product without copying its look or implying its capabilities.
    - Accessibility/responsive implications: clear heading hierarchy, definition-list stats, and the modal's existing responsive behavior.
+
+## 2026-10-20 — Inline launch-draft form (form-popup → inline page conversion)
+
+### Real references reviewed before implementation
+
+10. **Carbon Design System — Form usage**
+    https://www.carbondesignsystem.com/components/form/usage/
+    - Patterns observed: a form is structured as header (title + description for context), form body (labels always visible, positioned above inputs; sentence-style capitalization), and footer (submit actions); persistent helper text under fields; placeholder is never a label replacement; error state must block submission until fixed; two-column forms collapse as a group.
+    - What transfers: the inline form card now has a clear header ("Create launch draft" + "Draft settings are for preview only and are not submitted to a blockchain.") followed by the fields and a full-width "Review draft" action; labels stay visible above inputs; the description field is now marked "(optional)" instead of leaving ambiguity; error state blocks the draft review until fixed (unchanged logic).
+    - What does not transfer: Carbon's tooltip-driven fluid-input style and product-specific token vocabulary — OPENORBIT keeps its existing design tokens.
+    - Why it suits OPENORBIT: the form is now a first-class page section rather than a cramped dialog; the header/body/footer structure makes it scannable and honest about its draft-only status.
+    - Accessibility/responsive implications: labels remain programmatically linked (`htmlFor`/`id`) and the existing `aria-invalid`/`aria-describedby` wiring is untouched; the two-column `formgrid` already collapses to one column under 680px; the form card uses a light surface on the dark launch panel so label contrast stays high.
+
+11. **GOV.UK Design System — Error summary**
+    https://design-system.service.gov.uk/components/error-summary/
+    - Patterns observed: on validation failure, always show an error summary at the top of the form region with the heading "There is a problem", link each error to the field it relates to (href="#field-id"), and word summary errors exactly like the inline field errors; single-field questions link directly to the input.
+    - What transfers: the inline form now shows an error summary with "There is a problem", an explanatory line, and a link list where each entry links to its field (`#token-name`, `#token-symbol`, `#token-supply`) with wording identical to the inline error messages. The summary keeps `role="alert"` so it is announced.
+    - What does not transfer: GOV.UK's convention of moving keyboard focus to the summary container — OPENORBIT's standing behavior (and existing tests) focuses the first invalid field directly on failed submit, which also satisfies "land the user on the problem"; the summary links give the same jump-to-field capability as an additional path.
+    - Why it suits OPENORBIT: without a modal trap, the failed submit now gives users two ways to recover — immediate focus on the first invalid field plus a scannable summary of everything that needs fixing.
+    - Accessibility/responsive implications: links inside the alert are reachable by keyboard and announced with their destination context; the summary styles reuse the existing danger palette with visible `focus-visible` rings on the links; it reflows naturally inside the form card on narrow viewports.

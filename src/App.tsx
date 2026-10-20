@@ -40,7 +40,7 @@ export default function App(){
   const [filter,setFilter]=useState<AssetFilter>("all");
   const [query,setQuery]=useState("");
   const [sort,setSort]=useState<AssetSort>("featured");
-  const [dialog,setDialog]=useState<"wallet"|"launch"|"asset"|null>(null);
+  const [dialog,setDialog]=useState<"wallet"|"asset"|null>(null);
   const [selected,setSelected]=useState<Asset|null>(null);
   const [walletNotice,setWalletNotice]=useState("No connection request will be sent.");
   const [notice,setNotice]=useState("");
@@ -52,7 +52,12 @@ export default function App(){
   const supplyInput=useRef<HTMLInputElement>(null);
   const closeDialog=useCallback(()=>setDialog(null),[]);
   const resetSearchAndFilters=useCallback(()=>{setQuery("");setFilter("all");},[]);
-  const openLaunch=useCallback(()=>{setDraftErrors({name:"",symbol:"",supply:""});setResult(null);setDialog("launch");},[]);
+  const scrollToLaunch=useCallback(()=>{
+    setDraftErrors({name:"",symbol:"",supply:""});setResult(null);
+    const el=document.getElementById("launch");
+    if(el&&typeof el.scrollIntoView==="function") el.scrollIntoView({behavior:"smooth",block:"start"});
+    window.setTimeout(()=>{nameInput.current?.focus({preventScroll:true});},450);
+  },[]);
   const visible=useMemo(()=>{
     const q=query.trim().toLocaleLowerCase();
     const items=sampleAssets.filter(a=>(a.name+" "+a.symbol).toLocaleLowerCase().includes(q)&&(filter==="all"||a.tag===filter));
@@ -88,7 +93,7 @@ export default function App(){
       <section className="hero"><div>
         <div className="eyebrow">The on-chain launchpad · Early preview</div><h1>Find your next<br/><span className="grad">orbit.</span></h1>
         <p>Discover emerging community tokens, explore new launches, and prepare your own token project. Built for transparent, non-custodial exploration.</p>
-        <div className="actions"><button className="btn primary" type="button" onClick={()=>document.getElementById("explore")?.scrollIntoView({behavior:"smooth"})}>Explore assets ↘</button><button className="btn ghost" type="button" onClick={openLaunch}>Start a launch draft ↗</button></div>
+        <div className="actions"><button className="btn primary" type="button" onClick={()=>document.getElementById("explore")?.scrollIntoView({behavior:"smooth"})}>Explore assets ↘</button><button className="btn ghost" type="button" onClick={scrollToLaunch}>Start a launch draft ↘</button></div>
         <div className="notice">Preview mode: market figures are sample data. Wallet and token deployment actions are not connected to a live blockchain.</div>
       </div><aside className="hero-card" aria-label="Preview status">
         <div className="eyebrow">A new constellation</div><div className="orbitart" aria-hidden="true"><div className="orb"><div className="core"/></div></div>
@@ -120,7 +125,23 @@ export default function App(){
         </article>)}</div>
         {visible.length===0&&<div className="empty"><div><strong>No matching assets</strong><p>Try a different name or symbol, or reset your search and filters.</p></div><button className="btn" type="button" onClick={resetSearchAndFilters}>Reset search and filters</button></div>}
       </section>
-      <section className="launch" id="launch"><div><div className="eyebrow">Creator tools</div><h2>Build something worth discovering.</h2><p>Configure an initial token launch draft, review your project parameters, and prepare it for a future testnet integration. Drafts stay in this browser session.</p><div className="pillrow"><span className="pill">Parameter validation</span><span className="pill">Draft review</span><span className="pill">No live transactions</span></div></div><button className="btn primary" type="button" onClick={openLaunch}>Create launch draft ↗</button></section>
+      <section className="launch" id="launch"><div className="launch-intro"><div className="eyebrow">Creator tools</div><h2>Build something worth discovering.</h2><p>Configure an initial token launch draft, review your project parameters, and prepare it for a future testnet integration. Drafts stay in this browser session.</p><div className="pillrow"><span className="pill">Parameter validation</span><span className="pill">Draft review</span><span className="pill">No live transactions</span></div></div>
+        <div className="launch-card">
+          <h3 id="launch-form-title">Create launch draft</h3>
+          <p className="launch-card-sub">Draft settings are for preview only and are not submitted to a blockchain.</p>
+          <form onSubmit={submit} noValidate aria-labelledby="launch-form-title"><div className="formgrid">
+            <div className="field-group"><label htmlFor="token-name">Token name</label><input id="token-name" ref={nameInput} value={draft.name} onChange={e=>{setDraft({...draft,name:e.target.value});setDraftErrors(current=>({...current,name:""}));}} aria-invalid={Boolean(draftErrors.name)} aria-describedby={draftErrors.name?"token-name-error":undefined} required maxLength={40} placeholder="e.g. Open Orbit" autoComplete="off"/>{draftErrors.name&&<span id="token-name-error" className="field-error">{draftErrors.name}</span>}</div>
+            <div className="field-group"><label htmlFor="token-symbol">Token symbol</label><input id="token-symbol" ref={symbolInput} value={draft.symbol} onChange={e=>{setDraft({...draft,symbol:e.target.value.toUpperCase()});setDraftErrors(current=>({...current,symbol:""}));}} aria-invalid={Boolean(draftErrors.symbol)} aria-describedby={draftErrors.symbol?"token-symbol-error":undefined} required maxLength={10} pattern="[A-Za-z0-9]+" placeholder="e.g. ORBT" autoComplete="off"/>{draftErrors.symbol&&<span id="token-symbol-error" className="field-error">{draftErrors.symbol}</span>}</div>
+            <div className="field-group full"><label htmlFor="token-supply">Total supply</label><input id="token-supply" ref={supplyInput} value={draft.supply} onChange={e=>{setDraft({...draft,supply:e.target.value});setDraftErrors(current=>({...current,supply:""}));}} aria-invalid={Boolean(draftErrors.supply)} aria-describedby={draftErrors.supply?"token-supply-error":undefined} type="number" inputMode="numeric" min="1" max="1000000000000000" step="1" required placeholder="1000000000"/>{draftErrors.supply&&<span id="token-supply-error" className="field-error">{draftErrors.supply}</span>}</div>
+            <div className="field-group full"><label htmlFor="token-description">Description <span className="optional">(optional)</span></label><input id="token-description" value={draft.description} onChange={e=>setDraft({...draft,description:e.target.value})} maxLength={140} placeholder="What makes your project different?"/></div>
+          </div>{Object.values(draftErrors).some(Boolean)&&<div className="error-summary" role="alert"><strong>There is a problem</strong><p>Please fix the highlighted fields before reviewing this draft, or select a problem to jump to the field.</p><ul className="error-summary-list">
+            {draftErrors.name&&<li><a href="#token-name">{draftErrors.name}</a></li>}
+            {draftErrors.symbol&&<li><a href="#token-symbol">{draftErrors.symbol}</a></li>}
+            {draftErrors.supply&&<li><a href="#token-supply">{draftErrors.supply}</a></li>}
+          </ul></div>}<button className="btn primary" type="submit" style={{width:"100%"}}>Review draft</button></form>
+          {result&&<div className="draft-result" aria-live="polite"><h3>Draft ready for review</h3><p>{result.name} ({result.symbol}) · Total supply: {result.supply.toLocaleString()}{result.description?" · "+result.description:""}</p><div className="notice">Saved in this page only. No contract has been generated or deployed.</div><button className="btn" type="button" style={{width:"100%",marginTop:12}} onClick={()=>setResult(null)}>Edit draft</button></div>}
+        </div>
+      </section>
       <section id="how"><div className="sectionhead"><div><div className="eyebrow">Designed for clarity</div><h2>From idea to launch draft</h2><p>A safer workflow before chain and contract configuration are finalized.</p></div></div>
         <div className="stats"><div className="stat"><label>01 · Discover</label><strong className="step-title">Explore</strong><span className="step-copy">Search and compare community projects.</span></div><div className="stat"><label>02 · Prepare</label><strong className="step-title">Configure</strong><span className="step-copy">Draft a token name, supply, and symbol.</span></div><div className="stat"><label>03 · Review</label><strong className="step-title">Validate</strong><span className="step-copy">Review inputs before any future deployment.</span></div><div className="stat"><label>04 · Integrate</label><strong className="step-title">Testnet first</strong><span className="step-copy">Enable chain actions only after audit and approval.</span></div></div>
       </section>
@@ -131,16 +152,6 @@ export default function App(){
       <button className="walletopt" type="button" onClick={()=>setWalletNotice("MetaMask is shown as a UI preview only. No wallet provider is installed or contacted.")}><span className="walleticon" aria-hidden="true">M</span><span><strong>MetaMask</strong><span className="symbol">Browser wallet · Not connected</span></span></button>
       <button className="walletopt" type="button" onClick={()=>setWalletNotice("WalletConnect is shown as a UI preview only. No wallet provider is installed or contacted.")}><span className="walleticon" aria-hidden="true">W</span><span><strong>WalletConnect</strong><span className="symbol">Mobile wallet · Not configured</span></span></button>
       <div className="notice" role="status" aria-live="polite">{walletNotice}</div>
-    </Dialog>
-    <Dialog open={dialog==="launch"} title="Create launch draft" titleId="launchTitle" onClose={closeDialog}>
-      <p>Draft settings are for preview only and are not submitted to a blockchain.</p>
-      <form onSubmit={submit} noValidate><div className="formgrid">
-        <div className="field-group"><label htmlFor="token-name">Token name</label><input id="token-name" ref={nameInput} value={draft.name} onChange={e=>{setDraft({...draft,name:e.target.value});setDraftErrors(current=>({...current,name:""}));}} aria-invalid={Boolean(draftErrors.name)} aria-describedby={draftErrors.name?"token-name-error":undefined} required maxLength={40} placeholder="e.g. Open Orbit" autoComplete="off"/>{draftErrors.name&&<span id="token-name-error" className="field-error">{draftErrors.name}</span>}</div>
-        <div className="field-group"><label htmlFor="token-symbol">Token symbol</label><input id="token-symbol" ref={symbolInput} value={draft.symbol} onChange={e=>{setDraft({...draft,symbol:e.target.value.toUpperCase()});setDraftErrors(current=>({...current,symbol:""}));}} aria-invalid={Boolean(draftErrors.symbol)} aria-describedby={draftErrors.symbol?"token-symbol-error":undefined} required maxLength={10} pattern="[A-Za-z0-9]+" placeholder="e.g. ORBT" autoComplete="off"/>{draftErrors.symbol&&<span id="token-symbol-error" className="field-error">{draftErrors.symbol}</span>}</div>
-        <div className="field-group full"><label htmlFor="token-supply">Total supply</label><input id="token-supply" ref={supplyInput} value={draft.supply} onChange={e=>{setDraft({...draft,supply:e.target.value});setDraftErrors(current=>({...current,supply:""}));}} aria-invalid={Boolean(draftErrors.supply)} aria-describedby={draftErrors.supply?"token-supply-error":undefined} type="number" inputMode="numeric" min="1" max="1000000000000000" step="1" required placeholder="1000000000"/>{draftErrors.supply&&<span id="token-supply-error" className="field-error">{draftErrors.supply}</span>}</div>
-        <div className="field-group full"><label htmlFor="token-description">Description</label><input id="token-description" value={draft.description} onChange={e=>setDraft({...draft,description:e.target.value})} maxLength={140} placeholder="What makes your project different?"/></div>
-      </div>{Object.values(draftErrors).some(Boolean)&&<p className="error-summary" role="alert">Please fix the highlighted fields before reviewing this draft.</p>}<button className="btn primary" type="submit" style={{width:"100%"}}>Review draft</button></form>
-      {result&&<div className="draft-result" aria-live="polite"><h3>Draft ready for review</h3><p>{result.name} ({result.symbol}) · Total supply: {result.supply.toLocaleString()}{result.description?" · "+result.description:""}</p><div className="notice">Saved in this page only. No contract has been generated or deployed.</div><button className="btn" type="button" style={{width:"100%",marginTop:12}} onClick={()=>setResult(null)}>Edit draft</button></div>}
     </Dialog>
     <Dialog open={dialog==="asset"} title={selected?selected.name:"Asset details"} titleId="assetTitle" onClose={closeDialog}>
       {selected&&<div className="asset-detail">

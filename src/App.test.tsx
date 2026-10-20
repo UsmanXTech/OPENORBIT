@@ -38,9 +38,27 @@ describe("OPENORBIT marketplace preview",()=>{
   expect(screen.getByText("Solaris Collective")).toBeInTheDocument();
   expect(screen.queryByText("Nebula Network")).not.toBeInTheDocument();
  });
+ it("renders the launch-draft form inline in the page, never in a dialog",async()=>{
+  const user=userEvent.setup(); render(<App />);
+  expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  expect(screen.getByRole("textbox",{name:"Token name"})).toBeInTheDocument();
+  expect(screen.getByRole("button",{name:"Review draft"})).toBeInTheDocument();
+  await user.click(screen.getByRole("button",{name:/Start a launch draft/}));
+  expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  expect(screen.getByRole("textbox",{name:"Token name"})).toBeInTheDocument();
+ });
+ it("links every validation error from the summary to its field",async()=>{
+  const user=userEvent.setup(); render(<App />);
+  await user.click(screen.getByRole("button",{name:"Review draft"}));
+  const alert=screen.getByRole("alert");
+  expect(within(alert).getByText("There is a problem")).toBeInTheDocument();
+  const nameLink=within(alert).getByRole("link",{name:"Enter a token name."});
+  const supplyLink=within(alert).getByRole("link",{name:"Enter a total supply."});
+  expect(nameLink).toHaveAttribute("href","#token-name");
+  expect(supplyLink).toHaveAttribute("href","#token-supply");
+ });
  it("reviews a launch draft without deploying it",async()=>{
   const user=userEvent.setup(); render(<App />);
-  await user.click(screen.getByRole("button",{name:"Create launch draft ↗"}));
   await user.type(screen.getByRole("textbox",{name:"Token name"}),"Open Orbit");
   await user.type(screen.getByRole("textbox",{name:"Token symbol"}),"orbt");
   await user.type(screen.getByRole("spinbutton",{name:"Total supply"}),"1000000");
@@ -50,13 +68,12 @@ describe("OPENORBIT marketplace preview",()=>{
  });
  it("rejects a supply above the documented maximum",async()=>{
   const user=userEvent.setup(); render(<App />);
-  await user.click(screen.getByRole("button",{name:"Create launch draft ↗"}));
   await user.type(screen.getByRole("textbox",{name:"Token name"}),"Open Orbit");
   await user.type(screen.getByRole("textbox",{name:"Token symbol"}),"orbt");
   await user.type(screen.getByRole("spinbutton",{name:"Total supply"}),"1000000000000001");
   await user.click(screen.getByRole("button",{name:"Review draft"}));
   const supply=screen.getByRole("spinbutton",{name:"Total supply"});
-  expect(screen.getByText(/Supply must be between 1 and 1,000,000,000,000,000/)).toBeInTheDocument();
+  expect(screen.getAllByText(/Supply must be between 1 and 1,000,000,000,000,000/).length).toBe(2);
   expect(supply).toHaveAttribute("aria-invalid","true");
   expect(supply).toHaveAttribute("aria-describedby","token-supply-error");
   expect(supply).toHaveFocus();
@@ -64,20 +81,18 @@ describe("OPENORBIT marketplace preview",()=>{
  });
  it("shows field-level errors and focuses the first invalid input",async()=>{
   const user=userEvent.setup(); render(<App />);
-  await user.click(screen.getByRole("button",{name:"Create launch draft ↗"}));
   await user.click(screen.getByRole("button",{name:"Review draft"}));
   const name=screen.getByRole("textbox",{name:"Token name"});
   expect(name).toHaveAttribute("aria-invalid","true");
   expect(name).toHaveAttribute("aria-describedby","token-name-error");
   expect(name).toHaveFocus();
-  expect(screen.getByText("Enter a token name.")).toBeInTheDocument();
-  expect(screen.getByText("Use 1–10 letters or numbers for the symbol.")).toBeInTheDocument();
-  expect(screen.getByText("Enter a total supply.")).toBeInTheDocument();
+  expect(screen.getAllByText("Enter a token name.").length).toBe(2);
+  expect(screen.getAllByText("Use 1–10 letters or numbers for the symbol.").length).toBe(2);
+  expect(screen.getAllByText("Enter a total supply.").length).toBe(2);
   expect(screen.getByRole("alert")).toHaveTextContent(/fix the highlighted fields/i);
  });
  it("clears an inline error when its field is corrected",async()=>{
   const user=userEvent.setup(); render(<App />);
-  await user.click(screen.getByRole("button",{name:"Create launch draft ↗"}));
   await user.click(screen.getByRole("button",{name:"Review draft"}));
   const name=screen.getByRole("textbox",{name:"Token name"});
   await user.type(name,"Open Orbit");

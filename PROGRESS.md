@@ -118,3 +118,25 @@ Next milestones:
 - Verification (real runs, Node 24, same pinned lockfile): `npm run typecheck` passed; `npm test` 12/12 passed (was 10/10 before this run); `npm run build` passed.
 - Promotion: direct commit + push to `main` after a fresh `git fetch origin`; promotion status verified below (CI run on the new main head).
 - Next run: consider keyboard/announcement feedback for sort changes in the catalog (screen-reader users currently get no announcement when the sort order changes), plus a responsive check of the new dialog on narrow viewports.
+
+## 2026-10-20 — Inline launch-draft form (form-popup → inline page conversion)
+
+### Research-first decisions (recorded in UI_UX_RESEARCH.md §10–11)
+
+- Carbon Design System Form usage (https://www.carbondesignsystem.com/components/form/usage/): transferred header/body/footer form structure (title + description header, fields, full-width submit action), persistent visible labels, and "(optional)" marking for the description field; skipped Carbon's tooltip/fluid-input vocabulary.
+- GOV.UK Design System Error summary (https://design-system.service.gov.uk/components/error-summary/): transferred the "There is a problem" summary with per-field anchor links (`#token-name`, `#token-symbol`, `#token-supply`) worded identically to the inline errors; kept OPENORBIT's first-invalid-field focus (existing behavior/tests) instead of GOV.UK's focus-the-summary convention.
+
+### Implemented
+
+- The launch-draft form was converted from a modal Dialog into a full inline page section, per the hard no-form-in-dialog design rule. The `#launch` section is now a two-column grid: sticky creator intro on the left, a light form card on the right containing the title "Create launch draft", preview-only notice, all four fields, error summary, submit action, and draft-review result.
+- The dialog union is now `"wallet"|"asset"|null`; wallet and asset dialogs remain (informational views, not form-submission flows).
+- The hero "Start a launch draft ↘" button now smooth-scrolls to `#launch` and moves focus to the first field (guarded for environments without `scrollIntoView`).
+- Validation logic, first-invalid-field focus, `aria-invalid`/`aria-describedby` wiring, and draft-review result are unchanged; error summary is now a `role="alert"` box with a heading and field links.
+
+### Verification (real runs, Node 24)
+
+- `npm run typecheck`: passed (`tsc --noEmit`, no errors).
+- `npm test`: 14/14 passed (2 failures found and fixed during the run — one test-environment `scrollIntoView` guard, two assertions updated for errors now appearing both inline and in the summary links).
+- `npm run build`: passed (production bundle built to `dist/`).
+
+Files changed: `src/App.tsx`, `src/styles.css`, `src/App.test.tsx`, `README.md`, `UI_UX_RESEARCH.md`, `PROGRESS.md`.
