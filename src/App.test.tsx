@@ -1,5 +1,5 @@
 import {afterEach,describe,expect,it} from "vitest";
-import {cleanup,render,screen,within} from "@testing-library/react";
+import {cleanup,render,screen,waitFor,within} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import App from "./App";
 afterEach(()=>cleanup());
@@ -15,7 +15,7 @@ describe("OPENORBIT marketplace preview",()=>{
   await user.click(screen.getAllByRole("button",{name:"View details"})[0]);
   expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   const heading=screen.getByRole("heading",{name:"Lumen Protocol"});
-  expect(heading).toHaveFocus();
+  await waitFor(()=>expect(heading).toHaveFocus());
   expect(screen.getByRole("button",{name:/Back to explore assets/})).toBeInTheDocument();
   expect(screen.getByText("Sample price")).toBeInTheDocument();
   expect(screen.getByText("Sample market cap")).toBeInTheDocument();
@@ -117,10 +117,18 @@ describe("OPENORBIT marketplace preview",()=>{
   expect(name).not.toHaveAttribute("aria-describedby");
   expect(screen.queryByText("Enter a token name.")).not.toBeInTheDocument();
  });
- it("keeps wallet integration in preview mode",async()=>{
+ it("keeps wallet integration in preview mode via an inline panel, not a dialog",async()=>{
   const user=userEvent.setup(); render(<App />);
+  expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   await user.click(screen.getByRole("button",{name:"Connect wallet"}));
-  expect(screen.getByRole("dialog",{name:"Connect wallet"})).toBeInTheDocument();
+  expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  const heading=screen.getByRole("heading",{name:"Connect wallet"});
+  await waitFor(()=>expect(heading).toHaveFocus());
   expect(screen.getByText("No connection request will be sent.")).toBeInTheDocument();
+  await user.click(screen.getByRole("button",{name:/^MetaMask/}));
+  expect(screen.getByText(/No wallet provider is installed or contacted/)).toBeInTheDocument();
+  await user.click(screen.getByRole("button",{name:"Hide panel"}));
+  expect(screen.queryByRole("heading",{name:"Connect wallet"})).not.toBeInTheDocument();
+  expect(screen.getByRole("button",{name:"Connect wallet"})).toHaveFocus();
  });
 });

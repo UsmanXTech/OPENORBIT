@@ -155,3 +155,18 @@ Files changed: `src/App.tsx`, `src/styles.css`, `src/App.test.tsx`, `README.md`,
 - `npm run build`: passed (production bundle built to `dist/`).
 
 Files changed: `src/App.tsx`, `src/styles.css`, `src/App.test.tsx`, `UI_UX_RESEARCH.md`, `PROGRESS.md`.
+
+## 2026-10-20 — Wallet "Connect wallet" dialog → inline panel conversion
+
+- The last remaining modal dialog (wallet options) was removed and replaced with a full inline panel section (`#wallet`) rendered in the normal page flow after the stats overview, per the hard no-popup design rule (prefer inline pages over dialogs when in doubt). The app now ships zero modals: launch draft = inline form section, asset detail = inline page view, wallet = inline panel.
+- The header "Connect wallet" button reveals the panel: the page scrolls to it and programmatic focus moves to the panel heading ("Connect wallet", `tabIndex={-1}`, scroll-guarded). The panel shows explanatory copy, the MetaMask and WalletConnect option buttons (honest preview labels; selecting one only updates the status note), a `role="status"` live status notice, and a "Hide panel" button that collapses the panel and returns focus to the header "Connect wallet" button.
+- The generic `Dialog` component (focus trap, Escape handler, backdrop-dismiss) and all modal CSS (`.modalback`, `.modal`, `.modalhead`, `.x`) were deleted; new CSS: `.wallet-panel` card, `.wallet-head` layout with focus-visible ring handling, responsive `.wallet-grid` (2 columns → 1 under 680px).
+- Research recorded in UI_UX_RESEARCH.md §14–16: GOV.UK Design System (ships no modal component; canonical pattern is a full interruption page — confirmed via secondary docs quoting the GDS position), Carbon Design System dialog patterns ("disruptive... use them sparingly", don't put informational content in overlays), Fallingbrick modal best practices ("routine messages... better handled inline"; focus restored to the opener on close — preserved via the Hide-panel focus return).
+
+### Verification (real runs, Node)
+
+- `npm run typecheck`: passed (`tsc --noEmit`, no errors).
+- `npm test`: 15/15 passed (wallet test rewritten for the inline panel: asserts no `dialog` role anywhere, heading receives focus on open, provider option updates the live notice, Hide panel removes the panel and returns focus to the trigger; fixed one async-focus timing with `waitFor`).
+- `npm run build`: passed (production bundle built to `dist/`).
+
+Files changed: `src/App.tsx`, `src/styles.css`, `src/App.test.tsx`, `UI_UX_RESEARCH.md`, `PROGRESS.md`.

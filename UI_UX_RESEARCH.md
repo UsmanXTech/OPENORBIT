@@ -179,3 +179,31 @@ The launch-draft form previously returned one generic error for three different 
     - What does not transfer: GOV.UK's placement before `<main>` (OPENORBIT is a single-page demo, so the link sits at the top of the detail panel inside the page); no breadcrumb component is introduced.
     - Why it suits OPENORBIT: the detail view is a second-level view inside the explore journey, and an explicit back link is the most discoverable way out for sighted and screen-reader users alike — clearer than relying on Escape or an × button alone.
     - Accessibility/responsive implications: the back link is a native `<button>` with the app's standard `focus-visible` ring, recolored to the accent palette; it sits first in tab order on the detail view so keyboard users encounter the escape hatch immediately.
+
+## 2026-10-20 — Wallet "Connect wallet" dialog → inline panel conversion
+
+### Real references reviewed before implementation
+
+14. **GOV.UK Design System — no modal/dialog component (confirmed via secondary docs)**
+    https://tech-docs.teacherservices.cloud/services/check-performance-data/govuk-confirm-modal.html
+    - Patterns observed: the official GOV.UK Design System deliberately ships **no** modal/dialog component; its canonical confirmation pattern is a full server-rendered interruption page, so the user never loses place in a page flow behind an overlay. I confirmed this only via secondary search results and docs quoting the GDS position — there is no dedicated GOV.UK modal component page to inspect, which is itself the evidence (the component does not exist).
+    - What transfers: the last OPENORBIT dialog (wallet options) is removed entirely and rendered as a first-class inline section (`#wallet`) in the normal page flow, matching GDS's "interruption page" stance for content that deserves its own space.
+    - What does not transfer: GOV.UK's server-rendered navigation model — OPENORBIT is a single-page demo, so the wallet panel is shown/hidden in place with scroll-to and heading focus instead of a page load; the panel also carries a "Hide panel" dismissal, since the demo lets the user collapse it.
+    - Why it suits OPENORBIT: the wallet panel is informational reading (status + intended providers, no decision to take), exactly the content type dialog guidance says should not be an overlay; it also completes the app's standing no-form-in-dialog rule (the wallet panel, like the launch form and asset detail, now lives in page flow), so the app ships zero modals.
+    - Accessibility/responsive implications: no focus trap, no background inerting, and no Escape plumbing to maintain — the section is natively in tab order; opening moves programmatic focus to the panel heading (`tabIndex={-1}`, scroll-guarded) so screen readers announce the new context, and hiding returns focus to the header "Connect wallet" button; the provider grid collapses to one column under 680px.
+
+15. **Carbon Design System — Dialog patterns**
+    https://www.carbondesignsystem.com/building-blocks/core/patterns/dialogs
+    - Patterns observed: dialogs are "disruptive and can be distracting... Use them sparingly"; explicit don'ts: don't use if the content is unrelated to the current workflow, don't use to display complex or large amounts of data, don't recreate a full app or page in a dialog, don't use when the user hasn't triggered the dialog.
+    - What transfers: the wallet-options content (provider cards + status notice) is optional, non-critical information that the user can peruse while still seeing the rest of the page — Carbon's exact non-modal/dialog-sparing case; as a bonus, removing the last dialog also removes the need to keep focus-trap, Escape, and backdrop-click behavior tested.
+    - What does not transfer: Carbon's modal/non-modal taxonomy for the remaining flows — there are none left to classify; OPENORBIT now has no overlays at all.
+    - Why it suits OPENORBIT: the wallet panel answers "what would connecting look like?" — a knowledge-gathering moment, not a short task with a clear completion path — so inline placement serves comprehension better than a floating box; it also keeps the header "Connect wallet" button's honest label ("Preview mode" remains visible next to it).
+    - Accessibility/responsive implications: the panel's provider buttons stay real `<button>` elements with the app's global `focus-visible` ring; the status notice keeps `role="status"` + `aria-live="polite"` so provider selections are announced without stealing focus; reduced-motion users are unaffected since no animations or traps are involved.
+
+16. **Fallingbrick — Modal design UX best practices**
+    https://www.fallingbrick.co.uk/modals-in-web-design-best-practices/
+    - Patterns observed: common modal mistakes — "Using a modal for everything: Routine messages, long content and simple field errors are usually better handled inline"; "Putting too much in the overlay: If it needs multiple sections, extensive instructions or a long form, use a dedicated page"; accessibility checklist includes focus moving into the dialog, focus restored to the opener on close, and the background not being interactive.
+    - What transfers: the wallet panel content (title, explanatory copy, two provider options, live status notice) is a routine, non-urgent message block — handled inline per the checklist's "better handled inline" rule; the "restore focus to the opener" requirement is preserved in the inline version (hiding the panel returns focus to the "Connect wallet" button).
+    - What does not transfer: modal-specific mechanics (focus trap, backdrop dismissal) — deleted rather than emulated; the inline section needs none of them.
+    - Why it suits OPENORBIT: the previous dialog pattern for the wallet matched two listed mistakes (routine message shown as modal, informational content crammed in an overlay); the inline panel removes both at once with less code to maintain.
+    - Accessibility/responsive implications: because there is no overlay, nothing on the page is ever inert, so there is no risk of "leaving focus behind the dialog"; the panel reflows as normal document content on all viewports and honors the app's existing reduced-motion rules without extra work.

@@ -1,35 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { FormEvent, ReactNode } from "react";
+import type { FormEvent } from "react";
 import { sampleAssets } from "./data/assets";
 import type { Asset, AssetFilter, AssetSort, LaunchDraft } from "./types";
-
-function Dialog(props: {open:boolean; title:string; titleId:string; onClose:()=>void; children:ReactNode}) {
-  const panel=useRef<HTMLElement>(null);
-  const close=useRef<HTMLButtonElement>(null);
-  useEffect(()=>{
-    if(!props.open) return;
-    const previous=document.activeElement as HTMLElement|null;
-    close.current?.focus();
-    const keydown=(event:KeyboardEvent)=>{
-      if(event.key==="Escape"){event.preventDefault();props.onClose();return;}
-      if(event.key!=="Tab") return;
-      const nodes=panel.current?.querySelectorAll<HTMLElement>('button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),a[href],[tabindex]:not([tabindex="-1"])');
-      if(!nodes?.length){event.preventDefault();panel.current?.focus();return;}
-      const first=nodes[0],last=nodes[nodes.length-1];
-      if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
-      else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
-    };
-    document.addEventListener("keydown",keydown);
-    return ()=>{document.removeEventListener("keydown",keydown);previous?.focus();};
-  },[props.open,props.onClose]);
-  if(!props.open) return null;
-  return <div className="modalback show" onMouseDown={e=>{if(e.target===e.currentTarget)props.onClose();}}>
-    <section ref={panel} className="modal" role="dialog" aria-modal="true" aria-labelledby={props.titleId} tabIndex={-1}>
-      <div className="modalhead"><h2 id={props.titleId}>{props.title}</h2><button ref={close} className="x" type="button" onClick={props.onClose} aria-label="Close dialog">×</button></div>
-      {props.children}
-    </section>
-  </div>;
-}
 
 const filters:{value:AssetFilter;label:string}[]=[
   {value:"all",label:"All assets"},{value:"new",label:"New launches"},{value:"trending",label:"Trending"}
@@ -40,7 +12,7 @@ export default function App(){
   const [filter,setFilter]=useState<AssetFilter>("all");
   const [query,setQuery]=useState("");
   const [sort,setSort]=useState<AssetSort>("featured");
-  const [dialog,setDialog]=useState<"wallet"|null>(null);
+  const [walletOpen,setWalletOpen]=useState(false);
   const [selectedId,setSelectedId]=useState<string|null>(null);
   const [returnToId,setReturnToId]=useState<string|null>(null);
   const [walletNotice,setWalletNotice]=useState("No connection request will be sent.");
@@ -51,9 +23,24 @@ export default function App(){
   const nameInput=useRef<HTMLInputElement>(null);
   const symbolInput=useRef<HTMLInputElement>(null);
   const supplyInput=useRef<HTMLInputElement>(null);
+  const connectBtn=useRef<HTMLButtonElement>(null);
+  const walletHeading=useRef<HTMLHeadingElement>(null);
   const detailHeading=useRef<HTMLHeadingElement>(null);
-  const closeDialog=useCallback(()=>setDialog(null),[]);
+  const wasWalletOpen=useRef(false);
   const selected=selectedId?sampleAssets.find(a=>a.id===selectedId)??null:null;
+  const openWallet=useCallback(()=>{setWalletNotice("No connection request will be sent.");setWalletOpen(true);},[]);
+  const closeWallet=useCallback(()=>setWalletOpen(false),[]);
+  useEffect(()=>{
+    if(!walletOpen) return;
+    const el=document.getElementById("wallet");
+    if(el&&typeof el.scrollIntoView==="function") el.scrollIntoView({block:"start"});
+    const t=window.setTimeout(()=>{walletHeading.current?.focus({preventScroll:true});},80);
+    return ()=>window.clearTimeout(t);
+  },[walletOpen]);
+  useEffect(()=>{
+    if(wasWalletOpen.current&&!walletOpen) connectBtn.current?.focus({preventScroll:true});
+    wasWalletOpen.current=walletOpen;
+  },[walletOpen]);
   const openDetail=useCallback((a:Asset)=>{
     setReturnToId(a.id);
     setSelectedId(a.id);
@@ -116,7 +103,7 @@ export default function App(){
     <header className="top"><div className="wrap nav">
       <a className="brand" href="#top" aria-label="OPENORBIT home"><span className="logo" aria-hidden="true">O</span><span>OPENORBIT</span></a>
       <nav className="navlinks" aria-label="Main navigation"><a className="active" href="#explore">Explore</a><a href="#launch">Launch a token</a><a href="#how">How it works</a></nav>
-      <div className="right"><span className="net"><span className="dot" aria-hidden="true"/>Preview mode</span><button className="btn primary" type="button" onClick={()=>{setWalletNotice("No connection request will be sent.");setDialog("wallet");}}>Connect wallet</button></div>
+      <div className="right"><span className="net"><span className="dot" aria-hidden="true"/>Preview mode</span><button ref={connectBtn} className="btn primary" type="button" onClick={openWallet}>Connect wallet</button></div>
     </div></header>
     <main id="top" className="wrap">
       <section className="hero"><div>
@@ -134,6 +121,14 @@ export default function App(){
         <div className="stat"><label>Launch status</label><strong>Draft only</strong><small>No contract generated</small></div>
         <div className="stat"><label>Network</label><strong>Not connected</strong><small>No chain configured</small></div>
       </section>
+      {walletOpen&&<section id="wallet" className="wallet-panel" aria-labelledby="wallet-title">
+        <div className="wallet-head"><div><div className="eyebrow">Preview only</div><h2 id="wallet-title" ref={walletHeading} tabIndex={-1}>Connect wallet</h2><p>Wallet providers are not configured in this preview. The options below show the intended integration state — selecting one only updates the status note; no connection request is sent.</p></div><button className="btn" type="button" onClick={closeWallet}>Hide panel</button></div>
+        <div className="wallet-grid">
+          <button className="walletopt" type="button" onClick={()=>setWalletNotice("MetaMask is shown as a UI preview only. No wallet provider is installed or contacted.")}><span className="walleticon" aria-hidden="true">M</span><span><strong>MetaMask</strong><span className="symbol">Browser wallet · Not connected</span></span></button>
+          <button className="walletopt" type="button" onClick={()=>setWalletNotice("WalletConnect is shown as a UI preview only. No wallet provider is installed or contacted.")}><span className="walleticon" aria-hidden="true">W</span><span><strong>WalletConnect</strong><span className="symbol">Mobile wallet · Not configured</span></span></button>
+        </div>
+        <div className="notice" role="status" aria-live="polite">{walletNotice}</div>
+      </section>}
       <section id="explore">
         {selected?(<div id="asset-detail" className="asset-detail-page">
           <button type="button" className="back-link" onClick={closeDetail}><span aria-hidden="true">←</span> Back to explore assets</button>
@@ -187,11 +182,5 @@ export default function App(){
       </section>
       <footer className="footer"><div><strong className="footer-brand">OPENORBIT</strong><br/>A testnet-first launchpad preview.</div><div>Sample metrics are not market data. No wallet custody, trades, or token deployments are enabled.</div><div>© 2026 OPENORBIT · Preview build</div></footer>
     </main>
-    <Dialog open={dialog==="wallet"} title="Connect wallet" titleId="walletTitle" onClose={closeDialog}>
-      <p>Wallet providers are not configured in this preview. Choose an option to see the intended integration state.</p>
-      <button className="walletopt" type="button" onClick={()=>setWalletNotice("MetaMask is shown as a UI preview only. No wallet provider is installed or contacted.")}><span className="walleticon" aria-hidden="true">M</span><span><strong>MetaMask</strong><span className="symbol">Browser wallet · Not connected</span></span></button>
-      <button className="walletopt" type="button" onClick={()=>setWalletNotice("WalletConnect is shown as a UI preview only. No wallet provider is installed or contacted.")}><span className="walleticon" aria-hidden="true">W</span><span><strong>WalletConnect</strong><span className="symbol">Mobile wallet · Not configured</span></span></button>
-      <div className="notice" role="status" aria-live="polite">{walletNotice}</div>
-    </Dialog>
   </>;
 }
