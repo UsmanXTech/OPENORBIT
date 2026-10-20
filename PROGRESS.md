@@ -251,6 +251,11 @@ Files changed: `src/App.tsx`, `src/styles.css`, `src/App.test.tsx`, `UI_UX_RESEA
 - `UI_UX_RESEARCH.md` — sessions 22–23 (mandatory per-component research).
 - `PROGRESS.md` — this entry.
 
+### CI failure + fix (same run)
+
+- First promotion `f70c534` failed CI: 1 test failed — "rejects a supply above the documented maximum". Root cause: a pre-existing flake, not the new code — the view-heading focus timer (60ms `setTimeout` in `activate()`) can steal focus mid-typing on slow CI runners, dropping keystrokes (symbol field ended up empty, so focus landed on it instead of the supply field). Locally it passed 4/4.
+- Fix: the four launch-form tests that type into fields after a tab switch now `waitFor` the view heading to receive focus (the timer's job) before typing — synchronizing past the race. Verified 3× locally (28/28 each run); committed as `43a6033` and pushed. CI on `43a6033`: **success** (run 39380255992).
+
 ### Next
 
 - Record the live audit result; fix any residual page scroll or clipping it finds.
