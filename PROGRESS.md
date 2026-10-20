@@ -279,3 +279,8 @@ Files changed: `src/App.tsx` (seg refs, `onFilterKeyDown`, roving tabindex, Esca
 ### Next
 
 - Verify CI on the promoted commit; asset-detail polish (spacing/typography hierarchy in the inline detail page) remains the next UX candidate after the toolbar work lands.
+
+### Promotion
+
+- Direct commit `a6cb87d` pushed to `main` (`3fb7c3c..a6cb87d`) after a fresh fetch; tree clean, no concurrent work, no open PRs, no branch protections bypassed.
+- CI run 39384595809 on `a6cb87d`: **success** (typecheck + all tests + build, 20s). Vercel: not touched (read-only; auto-deploys on Vercel's side).
