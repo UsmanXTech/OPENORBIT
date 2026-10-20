@@ -50,6 +50,21 @@ describe("OPENORBIT marketplace preview",()=>{
   expect(screen.getByText(/Listing metrics are illustrative only/)).toBeInTheDocument();
   expect(screen.queryByRole("button",{name:/^View details/})).not.toBeInTheDocument();
  });
+ it("dedupes the detail stats to the two KPI cards (header owns identity)",async()=>{
+  const user=userEvent.setup(); render(<App />);
+  await user.click(screen.getAllByRole("button",{name:/^View details/})[0]);
+  const stats=screen.getByRole("heading",{name:"Lumen Protocol"}).closest(".asset-detail");
+  expect(stats).not.toBeNull();
+  // exactly two stat cards — Category/Listing no longer duplicate the header
+  expect((stats as HTMLElement).querySelectorAll("dt").length).toBe(2);
+  expect(within(stats as HTMLElement).getByText("Sample price")).toBeInTheDocument();
+  expect(within(stats as HTMLElement).getByText("Sample market cap")).toBeInTheDocument();
+  expect(within(stats as HTMLElement).queryByText("Category")).not.toBeInTheDocument();
+  expect(within(stats as HTMLElement).queryByText("Listing")).not.toBeInTheDocument();
+  // identity lives in the header: eyebrow + badge
+  expect(within(stats as HTMLElement).getByText(/Sample listing ·/i)).toBeInTheDocument();
+  expect(within(stats as HTMLElement).getByText(/Featured|New|Trending/)).toBeInTheDocument();
+ });
  it("returns to the catalog and restores focus to the triggering button",async()=>{
   const user=userEvent.setup(); render(<App />);
   const trigger=screen.getAllByRole("button",{name:/^View details/})[0];

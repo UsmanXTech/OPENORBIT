@@ -286,6 +286,22 @@ The launch-draft form previously returned one generic error for three different 
     - Why it suits OPENORBIT: search is the primary discovery control for the catalog; sharing the exact baseline with the switcher and reset link is what eliminates the previous ragged toolbar.
     - Accessibility/responsive implications: Escape-to-clear means keyboard users never have to Tab-hunt the ×; the 40px height preserves comfortable targets; on ≤680px the search wraps to its own full-width row below the switcher.
 
+26. **Uniswap — Explore tokens page (fetched directly)**
+    https://app.uniswap.org/explore/tokens/ethereum
+    - Patterns observed: token detail pages lead with an identity header (logo + name + symbol), then price/KPI hero metrics at the top, key metrics in a row beneath, and supporting sections stacked below — identity first, numbers second, context last. Category-style badges sit adjacent to the name rather than as separate stat cards.
+    - What transfers: the identity-first header (coin mark + eyebrow + larger name + symbol/badge subline on one band) and the KPI row (the two honest sample metrics given hero-scale numerals in a two-card row), removing stat cards that merely repeat header information (Category, Listing) — one source of truth per fact.
+    - What does not transfer: Uniswap's 1H/1D/FDV/volume rows and live charts — fabricating those figures would violate the no-fake-data rule; the illustrative-data fineprint stays, demoted from a loud callout box to a quiet footnote since it is a standing disclaimer, not an alert.
+    - Why it suits OPENORBIT: the inline detail page already replaced the table in-flow; giving it a proper detail-page hierarchy (header → KPIs → about → fineprint) makes it read like the reference product pages instead of a flat form, without adding any scroll risk — the page is now shorter than before.
+    - Accessibility/responsive implications: heading focus management unchanged (`tabIndex={-1}` + focus on open); KPI numerals use tabular figures for stability; single centered column (max-width 640px) keeps one comfortable reading measure, collapsing to a single KPI column at ≤680px.
+
+27. **CoinMarketCap — Coin Detail Page (CDP) patterns (via CoinMarketCap Academy article, read through search results)**
+    https://coinmarketcap.com/academy/es/article/cmcs-new-coin-detail-page-cdp-makes-crypto-tracking-easier-than-ever?ref=cryptoslav.io
+    - Patterns observed: a coin page leads with price and key metrics at the top, then the project description — and CMC's redesign explicitly converted long descriptions into collapsible sections so users don't "drown in a wall of text"; numerical info gets progress-bar visualization where it aids digestion.
+    - What transfers: the top-down information order (identity → key numbers → about) and the readability fix (comfortable line-height 1.7, 62ch measure) rather than literal collapsible sections — the demo has exactly one short description per asset, so collapse machinery would be noise.
+    - What does not transfer: watchlist widgets, ratings stars, institutional data, holder analytics — all live-data features the demo explicitly cannot offer; nothing new was added to the page, only hierarchy and redundancy were fixed.
+    - Why it suits OPENORBIT: confirms the chosen order and shows the about section earns its keep through readability, not chrome — the polish here is typographic, which costs no screen space in the no-scroll shell.
+    - Accessibility/responsive implications: no new interactive controls means no new keyboard contracts; the about paragraph's 1.7 line-height meets WCAG 1.4.12's text-spacing spirit at default rendering; fineprint at 11px stays above the 10px decorative floor and is a disclaimer, not essential content.
+
 ### Honest limitations
 
 - Internal scroll fallback: `.tablewrap`, the launch grid, the asset-detail panel, and now `.guide-view` use `overflow-y: auto` inside the fixed-height shell. On typical viewports (≥620px height) nothing scrolls; on very short viewports the panel scrolls internally while the page itself never scrolls. This is the documented last resort the design rule allows; desktop and most mobile portrait heights render fully scroll-free.

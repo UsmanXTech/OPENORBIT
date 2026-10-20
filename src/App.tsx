@@ -364,6 +364,9 @@ export default function App() {
                       {selected.initial}
                     </div>
                     <div>
+                      <p className="detail-eyebrow">
+                        Sample listing · {selected.category}
+                      </p>
                       <h3
                         id="asset-detail-title"
                         ref={detailHeading}
@@ -371,11 +374,11 @@ export default function App() {
                       >
                         {selected.name}
                       </h3>
-                      <div className="symbol">
-                        {selected.symbol} · {selected.category}
+                      <div className="detail-subline">
+                        <span className="symbol">{selected.symbol}</span>
+                        <span className="badge">{tagLabel(selected.tag)}</span>
                       </div>
                     </div>
-                    <span className="badge">{tagLabel(selected.tag)}</span>
                   </div>
                   <dl className="detail-stats">
                     <div>
@@ -386,23 +389,15 @@ export default function App() {
                       <dt>Sample market cap</dt>
                       <dd>{selected.marketCapLabel}</dd>
                     </div>
-                    <div>
-                      <dt>Category</dt>
-                      <dd>{selected.category}</dd>
-                    </div>
-                    <div>
-                      <dt>Listing</dt>
-                      <dd>{tagLabel(selected.tag)}</dd>
-                    </div>
                   </dl>
                   <div className="detail-about">
                     <h4>About this listing</h4>
                     <p>{selected.description}</p>
                   </div>
-                  <div className="notice">
+                  <p className="detail-fineprint">
                     Listing metrics are illustrative only — no live chain data
                     is connected. Trading is disabled in this preview.
-                  </div>
+                  </p>
                   <button
                     className="btn"
                     type="button"

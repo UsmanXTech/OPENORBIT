@@ -1,6 +1,27 @@
 # Engineering progress
 
-## 2026-10-17 — React application foundation
+## 2026-10-20 — Asset detail hierarchy polish (identity header + two KPI cards)
+
+- Starting state: `main` at `67ebc7b` (verified with `git fetch origin` + `git log --oneline -3 origin/main`); working tree clean; no open PRs; latest CI on main green.
+- This hour's highest-value improvement (the "asset-detail polish" item from the prior run): the inline asset detail page now has a proper detail-page hierarchy instead of a flat grid. Identity header leads: coin mark, "SAMPLE LISTING · <category>" eyebrow, larger name (24px, tight tracking), symbol + listing tag badge on one subline — then a two-card KPI row (Sample price, Sample market cap) with hero-scale numerals (20px, tabular figures). The redundant Category and Listing stat cards were removed — they duplicated facts already owned by the header, so each fact now has exactly one source of truth. The About section keeps its heading and gains readable typography (1.7 line-height, 62ch measure); the illustrative-data disclaimer is demoted from a loud callout box to a quiet footnote (`detail-fineprint`); the back-link and "Back to catalog" affordances are unchanged.
+- Research (mandatory per-component; UI_UX_RESEARCH.md §26–27, fetched directly this run): Uniswap Explore tokens page — identity header (logo+name+symbol) first, KPI metrics second, supporting sections last; badges next to the name, not in stat cards; live chart/volume rows not transferred (would be fabricated data). CoinMarketCap Coin Detail Page patterns — price/key-metrics-first order and the readability treatment of the about section; collapsible FAQ machinery not transferred (single short description doesn't need it); no new interactive controls, so no new keyboard contracts.
+- Accessibility: heading focus management unchanged (`tabIndex={-1}` focus on open, Escape closes, focus restored to the trigger); KPI numerals use `font-variant-numeric: tabular-nums`; single centered column collapses to one KPI card column at ≤680px; no-scroll invariants unchanged (`.asset-detail-page` keeps its last-resort `overflow-y: auto`; page is shorter than before, so internal scroll engages even less).
+
+### Verification (real runs, Node)
+
+- `npm run typecheck`: passed (`tsc --noEmit`, no errors).
+- `npm test`: 31/31 passed (16 app — 1 new: detail stats deduped to two KPI cards with header-owned identity — + 6 sort + 4 search + 5 no-scroll invariants).
+- `npm run build`: passed (production bundle built to `dist/`).
+
+Files changed: `src/App.tsx` (detail header markup, two-stat `<dl>`, fineprint), `src/styles.css` (single-column centered detail, 24px title, eyebrow, 20px KPI numerals, about line-height/measure, fineprint style; removed dead 900px detail rule and `.asset-detail .notice`), `src/App.test.tsx` (1 new test), `UI_UX_RESEARCH.md` (§26–27), `PROGRESS.md` (this entry).
+
+### Next
+
+- Verify CI on the promoted commit; next UX candidate: Wallet view polish (option-card hierarchy) or Launch intro-column typography review.
+
+### Promotion
+
+- Direct commit to `main` after a fresh fetch; tree clean, no concurrent work, no open PRs, no branch protections bypassed.
 
 Implemented in this milestone:
 
