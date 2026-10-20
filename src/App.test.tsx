@@ -260,4 +260,31 @@ describe("OPENORBIT marketplace preview",()=>{
   expect(describedBy).not.toBeNull();
   expect(document.getElementById(describedBy as string)?.textContent).toBe("Preview only");
  });
+ it("builds each wallet status row from name, detail, and text status",async()=>{
+  const user=userEvent.setup(); render(<App />);
+  await user.click(screen.getByRole("button",{name:"Wallet"}));
+  const list=screen.getByRole("list");
+  const rows=within(list).getAllByRole("listitem");
+  expect(rows).toHaveLength(5);
+  // row rhythm contract: every row carries a named component, a one-line
+  // detail, and a text (never color-only) status lozenge
+  for(const row of rows){
+   const name=row.querySelector("strong");
+   expect(name?.textContent).toBeTruthy();
+   expect(row.querySelector(".status-detail")?.textContent).toBeTruthy();
+   expect(row.querySelector(".lozenge")?.textContent).toBeTruthy();
+  }
+ });
+ it("keeps the filter, search, and reset controls in one toolbar row",async()=>{
+  const user=userEvent.setup(); render(<App />);
+  const toolbar=document.querySelector(".toolbar");
+  expect(toolbar).not.toBeNull();
+  // filter switcher and search field share the row; the reset control joins
+  // the same row once a filter is active
+  expect(toolbar?.querySelector(".seg")).not.toBeNull();
+  expect(toolbar?.querySelector(".search-control")).not.toBeNull();
+  expect(toolbar?.querySelector(".reset-controls")).toBeNull();
+  await user.click(screen.getByRole("button",{name:"Trending"}));
+  expect(toolbar?.querySelector(".reset-controls")).not.toBeNull();
+ });
 });

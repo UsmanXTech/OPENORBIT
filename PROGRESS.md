@@ -1,3 +1,30 @@
+## 2026-10-20 — Wallet status-list density + Explore toolbar field-sizing consistency (run #16)
+
+- Starting state: `main` at `7f0fb34` (verified with `git fetch origin` + `git log --oneline -3 origin/main`); working tree clean; no open PRs; latest CI on main green.
+- This hour's highest-value improvement (the queued "Wallet status-list density alignment with the new guide task-list row rhythm; then Explore toolbar field-sizing consistency pass" item from run #15): (1) the Wallet status list now shares the Guide view's GOV.UK task-list row rhythm — row padding 10px 14px → 12px 14px, gutter 12px → 14px, name 13px → 14px/700, detail 11.5px/1.5 → 12px/1.5, list margin 14px → 16px — so the divider-separated status rows and the standalone guide cards read as one product (two views that shared a seam are re-synced; rows, honesty, and lozenges unchanged); (2) the Explore toolbar's shared 40px baseline is fixed for real — the segmented switcher rendered 42px tall (3px padding ×2 + 34px tabs + 2px border) against the 40px search field and 40px reset control, a 2px baseline break; tabs are now min-height 32px so the switcher's outer height is exactly 40px (3+32+3+2), and the search-field geometry is consolidated (dead overridden 10px 12px base padding removed; base `.field` chrome + one 40px search rule). No behavior change: filter keyboard contract, Escape-to-clear, wallet statuses, DOM order, and the no-scroll layout are untouched.
+- Research (mandatory per-component; UI_UX_RESEARCH.md §39–40, read this run): Statuspage component-list pattern — GitHub Status page (opened directly; fetch returned incident-timeline text, not component markup — limitation recorded), OnlineOrNot status-page components docs (opened directly: per-component rows, name + text status + dividers, 5–10 components, fixed status vocabulary); public-status-page guide excerpts. Carbon Forms pattern page (opened directly: 40px default input height regardless of context, consistency of alignments and geometries is key); NNGroup form-usability Top 10 (excerpts — limitation recorded: match fields to input size, same layout across the site). Not transferred: real operational statuses/incident machinery (demo honesty), Carbon's 32px spacing (shell exception), field-width-as-affordance for the search field (flex fill is the deliberate primary-action override).
+
+### Verification (real runs, Node)
+
+- `npm run typecheck`: passed (`tsc --noEmit`, no errors).
+- `npm test`: 43/43 passed (41 existing + 2 new: wallet status rows each carry name/detail/text-status-lozenge; toolbar keeps filter switcher, search field, and reset control in one `.toolbar` row — reset joins the row once a filter is active).
+- `npm run build`: passed (production bundle built to `dist/`).
+
+### Files changed
+
+- `src/styles.css` — `.tab` min-height 34px → 32px (switcher outer height now exactly 40px); `.field` base padding 10px 12px → 0 12px (dead override removed) with the 40px search rule consolidated; `.status-row` padding 12px 14px, gap 14px; `.status-main strong` 14px/700; `.status-detail` 12px/1.5; `.status-list` margin 16px 0. Short-viewport density fallbacks unchanged.
+- `src/App.test.tsx` — 2 new tests (wallet status-row structure contract; toolbar single-row control structure).
+- `UI_UX_RESEARCH.md` — sessions 39–40 (mandatory per-component research) + honest-limitations notes for run #16.
+- `PROGRESS.md` — this entry.
+
+### Next
+
+- Verify CI on the promoted commit. Next UX candidates: asset-detail typography hierarchy review; then the no-scroll live-geometry audit follow-ups (both within the no-scroll shell).
+
+### Promotion
+
+- PENDING — filled in after push + CI.
+
 # Engineering progress
 
 ## 2026-10-20 — Launch-view density polish (proportional form columns, card header, button geometry in CSS)
