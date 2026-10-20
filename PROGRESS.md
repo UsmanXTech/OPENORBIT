@@ -25,6 +25,11 @@
 - Wallet view honest-status redesign (it is the least polished view; keep it inline and clearly preview-only, no real connections).
 - Continue no-scroll structural audits as views change; pixel-measured live audit still blocked at tooling level.
 
+### Promotion
+
+- Direct commit `4eb41a6` pushed to `main` (`310f188..4eb41a6`) after a fresh fetch; tree clean, no concurrent work, no open PRs, no branch protections bypassed.
+- CI on `4eb41a6`: **success** (typecheck + 33 tests + build). Vercel: not touched (read-only; auto-deploys on Vercel's side).
+
 ## 2026-10-20 — Asset detail hierarchy polish (identity header + two KPI cards)
 
 - Starting state: `main` at `67ebc7b` (verified with `git fetch origin` + `git log --oneline -3 origin/main`); working tree clean; no open PRs; latest CI on main green.
