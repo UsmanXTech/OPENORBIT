@@ -207,3 +207,36 @@ The launch-draft form previously returned one generic error for three different 
     - What does not transfer: modal-specific mechanics (focus trap, backdrop dismissal) — deleted rather than emulated; the inline section needs none of them.
     - Why it suits OPENORBIT: the previous dialog pattern for the wallet matched two listed mistakes (routine message shown as modal, informational content crammed in an overlay); the inline panel removes both at once with less code to maintain.
     - Accessibility/responsive implications: because there is no overlay, nothing on the page is ever inert, so there is no risk of "leaving focus behind the dialog"; the panel reflows as normal document content on all viewports and honors the app's existing reduced-motion rules without extra work.
+
+## 2026-10-20 — Screen-fitted single-page app shell: tabbed views, no page scroll
+
+### Real references reviewed before implementation
+
+17. **Uniswap — "How to use the Uniswap Explore page" (support doc)**
+    https://support.uniswap.org/hc/en-us/articles/9818094509453-How-to-use-the-Uniswap-Explore-page
+    - Patterns observed: the Explore page separates Tokens, Pools, and Transactions into three tabs within one context; the Tokens tab is a dense sortable table (price, price change, FDV, volume) with a name/address/symbol search filter — one screen, one dense data surface, no marketing hero above it.
+    - What transfers: one view = one dense surface; tabbed grouping of sibling contexts (Explore/Launch/Wallet/Guide); a real `<table>` for the asset catalog with sticky headers and a compact action column; the search-by-name-or-symbol filter kept as the primary discovery control.
+    - What does not transfer: Uniswap's live market columns (price change, FDV, volume) — every OPENORBIT figure stays explicitly sample-labeled; no embedded execution (swap/buy) inside detail views.
+    - Why it suits OPENORBIT: the Explore view's job is "scan six sample listings at a glance" — a dense table with one action per row is the established crypto-product idiom for exactly that, and it is what makes the whole view fit one screen.
+    - Accessibility/responsive implications: the table uses real `<th scope="col">` headers and per-row named buttons (`View details for {name}`); on ≤680px the table reflows to compact cards (category/market-cap columns drop, mirroring how responsive data tables must stay operable), so the same markup serves both layouts.
+
+18. **W3C WAI-ARIA APG — Tabs Pattern (fetched directly)**
+    https://www.w3.org/WAI/ARIA/apg/patterns/tabs/
+    - Patterns observed: tablist/tab/tabpanel roles; the active tab has `aria-selected="true"`; tabs reference panels via `aria-controls`; Left/Right arrows move focus (with wrap), Home/End jump to ends; automatic activation is recommended when panels render without latency; `tabpanel` needs `tabindex="0"` only when it has no focusable content.
+    - What transfers: the full keyboard contract — roving tabindex (active tab 0, others −1), arrow-key navigation with wrap and auto-activation, Home/End support; tabpanel labelled by its tab.
+    - What does not transfer: keeping focus on the tab after explicit activation — OPENORBIT moves focus to the panel heading on click/Enter (the existing focus-to-heading convention from the wallet/detail conversions) while arrow-key auto-activation keeps focus on the tab, plus a visually-hidden `role="status"` live region announcing the view name.
+    - Why it suits OPENORBIT: the app is literally "a set of layered sections of content that display one panel at a time" (APG's own definition) — tabs are the canonical component for the no-scroll single-view rule.
+    - Accessibility/responsive implications: single tab stop for all four views keeps keyboard tab order short; screen readers hear view changes via the live region and panel headings (`tabIndex={-1}`); reduced-motion users see no animation on view switches.
+
+19. **Carbon Design System — Tabs usage**
+    https://v10.carbondesignsystem.com/components/tabs/usage/
+    - Patterns observed: "Use tabs to allow users to navigate easily between views within the same context"; tab labels concise (no more than two words), no icons in labels; no more than six tabs; consistent order across the experience.
+    - What transfers: the four one-word labels (Explore, Launch, Wallet, Guide); placement as the primary in-header navigation; the "same context" framing — all four views stay inside one preview app, never routed to separate pages.
+    - What does not transfer: Carbon's tab-line visual language — OPENORBIT keeps its existing segmented pill styling for visual consistency with the category filter control.
+    - Why it suits OPENORBIT: four ≤2-word labels keep the tab strip compact enough for the 100dvh shell on narrow screens, and the "one context" rule matches the single-shell architecture.
+    - Accessibility/responsive implications: concise labels survive translation and narrow viewports; on ≤680px the tablist scrolls horizontally within the fixed top bar rather than wrapping the header taller (which would steal vertical space from the single screen).
+
+### Honest limitations
+
+- Internal scroll fallback: `.tablewrap`, the launch grid, and the asset-detail panel use `overflow-y: auto` inside the fixed-height shell. On typical viewports (≥620px height) nothing scrolls; on very short viewports the panel scrolls internally while the page itself never scrolls. This is the documented last resort the design rule allows; desktop and most mobile portrait heights render fully scroll-free.
+- The Uniswap live app (app.uniswap.org/explore/tokens) is a JS bundle and could not be text-fetched in this run either — the support doc plus the previously recorded Uniswap research (token-detail structure) stand as the inspected references.

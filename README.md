@@ -8,10 +8,10 @@ The frontend has been migrated from a single-file HTML prototype to a React + Ty
 
 ### Included
 
-- Responsive marketplace layout and sample asset cards
-- Search, category filters, and sorting
-- Asset details and wallet-preview dialogs (informational only); the launch-draft form renders as a full inline page section, never a dialog
-- Keyboard Escape handling, focus cycling, focus restoration, and visible focus states
+- Screen-fitted single-page app shell (100dvh, no page scroll): Explore / Launch / Wallet / Guide views switch via an accessible tab navigation (W3C APG tabs pattern, arrow-key support, live view announcements)
+- Dense token table for the sample catalog (sticky headers, per-row detail actions; reflows to compact cards on narrow screens) replacing the old card grid
+- Search, category filters, and sorting; asset detail and wallet preview as inline views, never dialogs
+- Keyboard Escape handling, focus management, and visible focus states
 - Client-side validation for launch-draft fields
 - Unit tests for core preview interactions
 - GitHub Actions workflow for type-checking, tests, and production builds

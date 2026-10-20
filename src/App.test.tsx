@@ -10,9 +10,36 @@ describe("OPENORBIT marketplace preview",()=>{
   expect(screen.getByText("Lumen Protocol")).toBeInTheDocument();
   expect(screen.getByText(/Preview mode: market figures are sample data/)).toBeInTheDocument();
  });
+ it("shows exactly one view at a time via the tab navigation",async()=>{
+  const user=userEvent.setup(); render(<App />);
+  const tablist=screen.getByRole("tablist",{name:"App views"});
+  expect(within(tablist).getAllByRole("tab")).toHaveLength(4);
+  expect(screen.getByRole("tabpanel")).toHaveAttribute("aria-labelledby","tab-explore");
+  expect(screen.getByRole("heading",{name:"Explore assets"})).toBeInTheDocument();
+  expect(screen.queryByRole("heading",{name:"Create launch draft"})).not.toBeInTheDocument();
+  await user.click(screen.getByRole("tab",{name:"Guide"}));
+  expect(screen.getByRole("heading",{name:"From idea to launch draft"})).toBeInTheDocument();
+  expect(screen.queryByRole("heading",{name:"Explore assets"})).not.toBeInTheDocument();
+  expect(screen.getByRole("tab",{name:"Guide"})).toHaveAttribute("aria-selected","true");
+  expect(screen.getByRole("tab",{name:"Explore"})).toHaveAttribute("aria-selected","false");
+ });
+ it("navigates views with arrow keys following the tabs pattern",async()=>{
+  const user=userEvent.setup(); render(<App />);
+  const exploreTab=screen.getByRole("tab",{name:"Explore"});
+  exploreTab.focus();
+  await user.keyboard("{ArrowRight}");
+  const launchTab=screen.getByRole("tab",{name:"Launch"});
+  expect(launchTab).toHaveFocus();
+  expect(launchTab).toHaveAttribute("aria-selected","true");
+  expect(screen.getByRole("heading",{name:"Create launch draft"})).toBeInTheDocument();
+  expect(screen.queryByRole("heading",{name:"Explore assets"})).not.toBeInTheDocument();
+  await user.keyboard("{ArrowLeft}");
+  expect(screen.getByRole("tab",{name:"Explore"})).toHaveFocus();
+  expect(screen.getByRole("heading",{name:"Explore assets"})).toBeInTheDocument();
+ });
  it("shows the asset detail as an inline page with sample-labeled stats",async()=>{
   const user=userEvent.setup(); render(<App />);
-  await user.click(screen.getAllByRole("button",{name:"View details"})[0]);
+  await user.click(screen.getAllByRole("button",{name:/^View details/})[0]);
   expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   const heading=screen.getByRole("heading",{name:"Lumen Protocol"});
   await waitFor(()=>expect(heading).toHaveFocus());
@@ -21,26 +48,26 @@ describe("OPENORBIT marketplace preview",()=>{
   expect(screen.getByText("Sample market cap")).toBeInTheDocument();
   expect(screen.getByText("About this listing")).toBeInTheDocument();
   expect(screen.getByText(/Listing metrics are illustrative only/)).toBeInTheDocument();
-  expect(screen.queryByRole("button",{name:"View details"})).not.toBeInTheDocument();
+  expect(screen.queryByRole("button",{name:/^View details/})).not.toBeInTheDocument();
  });
  it("returns to the catalog and restores focus to the triggering button",async()=>{
   const user=userEvent.setup(); render(<App />);
-  const trigger=screen.getAllByRole("button",{name:"View details"})[0];
+  const trigger=screen.getAllByRole("button",{name:/^View details/})[0];
   await user.click(trigger);
   await user.click(screen.getByRole("button",{name:"Back to catalog"}));
   expect(screen.queryByText("About this listing")).not.toBeInTheDocument();
-  const triggers=screen.getAllByRole("button",{name:"View details"});
+  const triggers=screen.getAllByRole("button",{name:/^View details/});
   expect(triggers.length).toBeGreaterThan(0);
   expect(triggers[0]).toHaveFocus();
  });
  it("closes the asset detail view with Escape",async()=>{
   const user=userEvent.setup(); render(<App />);
-  await user.click(screen.getAllByRole("button",{name:"View details"})[0]);
+  await user.click(screen.getAllByRole("button",{name:/^View details/})[0]);
   expect(screen.getByRole("heading",{name:"Lumen Protocol"})).toBeInTheDocument();
   await user.keyboard("{Escape}");
   expect(screen.queryByText("About this listing")).not.toBeInTheDocument();
   expect(screen.queryByRole("button",{name:/Back to explore assets/})).not.toBeInTheDocument();
-  expect(screen.getAllByRole("button",{name:"View details"}).length).toBeGreaterThan(0);
+  expect(screen.getAllByRole("button",{name:/^View details/}).length).toBeGreaterThan(0);
  });
  it("filters assets by name or symbol",async()=>{
   const user=userEvent.setup(); render(<App />);
@@ -55,17 +82,19 @@ describe("OPENORBIT marketplace preview",()=>{
   expect(screen.getByText("Solaris Collective")).toBeInTheDocument();
   expect(screen.queryByText("Nebula Network")).not.toBeInTheDocument();
  });
- it("renders the launch-draft form inline in the page, never in a dialog",async()=>{
+ it("renders the launch-draft form inline in the Launch view, never in a dialog",async()=>{
   const user=userEvent.setup(); render(<App />);
+  expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  await user.click(screen.getByRole("tab",{name:"Launch"}));
   expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   expect(screen.getByRole("textbox",{name:"Token name"})).toBeInTheDocument();
   expect(screen.getByRole("button",{name:"Review draft"})).toBeInTheDocument();
-  await user.click(screen.getByRole("button",{name:/Start a launch draft/}));
-  expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-  expect(screen.getByRole("textbox",{name:"Token name"})).toBeInTheDocument();
+  const heading=screen.getByRole("heading",{name:"Create launch draft"});
+  await waitFor(()=>expect(heading).toHaveFocus());
  });
  it("links every validation error from the summary to its field",async()=>{
   const user=userEvent.setup(); render(<App />);
+  await user.click(screen.getByRole("tab",{name:"Launch"}));
   await user.click(screen.getByRole("button",{name:"Review draft"}));
   const alert=screen.getByRole("alert");
   expect(within(alert).getByText("There is a problem")).toBeInTheDocument();
@@ -76,6 +105,7 @@ describe("OPENORBIT marketplace preview",()=>{
  });
  it("reviews a launch draft without deploying it",async()=>{
   const user=userEvent.setup(); render(<App />);
+  await user.click(screen.getByRole("tab",{name:"Launch"}));
   await user.type(screen.getByRole("textbox",{name:"Token name"}),"Open Orbit");
   await user.type(screen.getByRole("textbox",{name:"Token symbol"}),"orbt");
   await user.type(screen.getByRole("spinbutton",{name:"Total supply"}),"1000000");
@@ -85,6 +115,7 @@ describe("OPENORBIT marketplace preview",()=>{
  });
  it("rejects a supply above the documented maximum",async()=>{
   const user=userEvent.setup(); render(<App />);
+  await user.click(screen.getByRole("tab",{name:"Launch"}));
   await user.type(screen.getByRole("textbox",{name:"Token name"}),"Open Orbit");
   await user.type(screen.getByRole("textbox",{name:"Token symbol"}),"orbt");
   await user.type(screen.getByRole("spinbutton",{name:"Total supply"}),"1000000000000001");
@@ -98,6 +129,7 @@ describe("OPENORBIT marketplace preview",()=>{
  });
  it("shows field-level errors and focuses the first invalid input",async()=>{
   const user=userEvent.setup(); render(<App />);
+  await user.click(screen.getByRole("tab",{name:"Launch"}));
   await user.click(screen.getByRole("button",{name:"Review draft"}));
   const name=screen.getByRole("textbox",{name:"Token name"});
   expect(name).toHaveAttribute("aria-invalid","true");
@@ -110,6 +142,7 @@ describe("OPENORBIT marketplace preview",()=>{
  });
  it("clears an inline error when its field is corrected",async()=>{
   const user=userEvent.setup(); render(<App />);
+  await user.click(screen.getByRole("tab",{name:"Launch"}));
   await user.click(screen.getByRole("button",{name:"Review draft"}));
   const name=screen.getByRole("textbox",{name:"Token name"});
   await user.type(name,"Open Orbit");
@@ -117,7 +150,7 @@ describe("OPENORBIT marketplace preview",()=>{
   expect(name).not.toHaveAttribute("aria-describedby");
   expect(screen.queryByText("Enter a token name.")).not.toBeInTheDocument();
  });
- it("keeps wallet integration in preview mode via an inline panel, not a dialog",async()=>{
+ it("keeps wallet integration in preview mode via the Wallet view, not a dialog",async()=>{
   const user=userEvent.setup(); render(<App />);
   expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   await user.click(screen.getByRole("button",{name:"Connect wallet"}));
@@ -127,8 +160,8 @@ describe("OPENORBIT marketplace preview",()=>{
   expect(screen.getByText("No connection request will be sent.")).toBeInTheDocument();
   await user.click(screen.getByRole("button",{name:/^MetaMask/}));
   expect(screen.getByText(/No wallet provider is installed or contacted/)).toBeInTheDocument();
-  await user.click(screen.getByRole("button",{name:"Hide panel"}));
+  await user.click(screen.getByRole("tab",{name:"Explore"}));
   expect(screen.queryByRole("heading",{name:"Connect wallet"})).not.toBeInTheDocument();
-  expect(screen.getByRole("button",{name:"Connect wallet"})).toHaveFocus();
+  expect(screen.getByRole("heading",{name:"Explore assets"})).toBeInTheDocument();
  });
 });

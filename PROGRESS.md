@@ -170,3 +170,28 @@ Files changed: `src/App.tsx`, `src/styles.css`, `src/App.test.tsx`, `UI_UX_RESEA
 - `npm run build`: passed (production bundle built to `dist/`).
 
 Files changed: `src/App.tsx`, `src/styles.css`, `src/App.test.tsx`, `UI_UX_RESEARCH.md`, `PROGRESS.md`.
+
+## 2026-10-20 — Screen-fitted single-page app shell (Rule 2 conversion: tabbed views, zero page scroll)
+
+- Starting state: `main` at `84d5e45` (verified with `git fetch origin` + `git log --oneline -3 origin/main`); working tree clean; no open PRs; latest CI on main green.
+- This hour's highest-value improvement: the stacked scrolling page (hero → stats → explore → launch → how-it-works → footer) was converted into a **screen-fitted single-page app** per Hard Design Rule 2. The app is now a `100dvh` flex shell: compact top bar (brand + tab navigation + Preview badge + Connect wallet), one visible view at a time, and a slim one-line status strip (replacing the old footer). The page never scrolls; each view is a single screen.
+- Views (tabs: Explore / Launch / Wallet / Guide, one-word labels per Carbon):
+  - **Explore**: compact header + toolbar (category segmented filter, search, sort, reset) + dense token `<table>` (sticky headers; Token/Category/Sample price/Sample market cap/Listing/Actions columns; per-row "Details" and "Trade · demo" buttons) replacing the card grid; all 6 sample rows fit one screen. Asset detail opens inline replacing the table (back link, Escape, focus restore — preserved).
+  - **Launch**: two-column single screen — compact intro (eyebrow, heading, short copy, pills) + the existing form card with unchanged validation/error-summary/first-invalid-field-focus logic.
+  - **Wallet**: centered single-screen panel — heading, preview copy, MetaMask/WalletConnect options, `role="status"` live notice. The top-bar "Connect wallet" button now activates this tab.
+  - **Guide**: the former "How it works" 4 steps as compact cards + safety notice (content preserved, no longer a stacked page section).
+- Accessibility (W3C APG Tabs Pattern, fetched this run): `tablist`/`tab`/`tabpanel` roles, `aria-selected`, `aria-controls`, roving tabindex, Left/Right/Home/End arrow navigation with wrap and automatic activation; explicit activation (click/Enter) moves focus to the view heading; a visually-hidden `role="status"` live region announces view changes. No dialogs anywhere (zero overlays, unchanged from last run).
+- Honest limitation: `.tablewrap`, the launch grid, and the asset-detail panel use internal `overflow-y:auto` as a last-resort fallback on very short viewports (<~620px); typical desktop and mobile-portrait heights render fully scroll-free. The Uniswap live app (JS bundle) could not be text-fetched; the support doc + prior Uniswap research stand as inspected references.
+- Research (mandatory per-component; recorded in `UI_UX_RESEARCH.md` §17–19): (1) Uniswap "How to use the Explore page" support doc (https://support.uniswap.org/hc/en-us/articles/9818094509453-How-to-use-the-Uniswap-Explore-page) — dense tabbed token table; (2) W3C ARIA APG Tabs Pattern (https://www.w3.org/WAI/ARIA/apg/patterns/tabs/) — full keyboard contract; (3) Carbon Design System Tabs usage (https://v10.carbondesignsystem.com/components/tabs/usage/) — concise labels, same-context navigation.
+- Files changed: `src/App.tsx` (tab shell + 4 views; table catalog; removed hero/stats stacked sections, scrollIntoView logic), `src/styles.css` (100dvh shell, tablist, table, view layouts, responsive card reflow ≤680px), `src/App.test.tsx` (rewritten for tab navigation: 3 new/rewritten tests — single-view switching, arrow-key tabs contract, launch/wallet via tabs), `README.md` (feature list), `UI_UX_RESEARCH.md` (§17–19), `PROGRESS.md` (this entry).
+
+### Verification (real runs, Node)
+
+- `npm run typecheck`: passed (`tsc --noEmit`, no errors).
+- `npm test`: 17/17 passed (15 app + 2 search).
+- `npm run build`: passed (production bundle built to `dist/`).
+
+### Promotion
+
+- Direct commit + push to `main` after a fresh `git fetch origin`; promotion status verified below (CI run on the new main head).
+- Next run: per-view height audit on short/narrow viewports (verify the no-scroll claim renders scroll-free at 360×640 and 1366×768), then continue the UI/UX redesign priority — e.g. richer Explore table affordances (column sort headers replacing the select) or Launch-view density polish.
