@@ -23,7 +23,9 @@
 
 ### Promotion
 
-- PENDING — filled in after push + CI.
+- Direct commit `7a911ed` pushed to `main` (`7f0fb34..7a911ed`) after a fresh fetch; tree clean, no concurrent work, no open PRs, no branch protections bypassed.
+- CI on `7a911ed` (feature): first attempt **failed** with the known pre-existing slow-runner flake ("moves keyboard focus to the field when a summary link is activated" — 42/43 passed, both new tests green; the view-heading 60ms focus timer steals focus mid-typing on loaded CI runners, same race as runs #8/#14/#15, and this run's changes touch none of that code — CSS + 2 new tests only); workflow rerun: **success**. Final CI on main green; no code changed by the rerun.
+- Vercel: not touched (read-only; auto-deploys on Vercel's side).
 
 # Engineering progress
 
