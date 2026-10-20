@@ -26,7 +26,8 @@
 
 ### Promotion
 
-- (to be filled after promotion)
+- Direct commit `27735b3` pushed to `main` (`f73f329..27735b3`) after a fresh fetch; tree clean (run #12's local docs edit folded in), no concurrent work, no open PRs, no branch protections bypassed.
+- CI run 39395026588 on `27735b3`: **success** (typecheck + 36 tests + build, 22s). Vercel: not touched (read-only; auto-deploys on Vercel's side).
 
 ## 2026-10-20 — Wallet honest-status redesign: connection-status report replaces fake connect buttons
 
