@@ -161,12 +161,15 @@ h3 { margin: 0 0 3px; font-size: 14px; font-weight: 750; letter-spacing: -.02em;
 .walletopt:hover { border-color: #c7bcff; background: #fbfaff; }
 .walleticon { display: grid; place-items: center; width: 38px; height: 38px; flex: none; border-radius: 11px; background: var(--accent-soft); color: var(--accent); font-weight: 850; }
 .walletopt .symbol { margin-top: 3px; }
+.field-group { min-width: 0; }
 .formgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; margin: 16px 0; }
 .formgrid label { display: block; color: #4f505b; font-size: 11px; font-weight: 700; }
 .formgrid input { display: block; width: 100%; min-width: 0; margin-top: 6px; padding: 11px; border: 1px solid var(--border-strong); border-radius: 9px; background: white; color: var(--text); font-size: 12px; }
-.formgrid input:focus { border-color: var(--accent); outline: 3px solid rgba(107,78,255,.15); }
+.formgrid input:focus { border-color: var(--accent); }
+.formgrid input[aria-invalid="true"] { border-color: var(--danger); background: #fffafb; }
 .formgrid .full { grid-column: 1 / -1; }
-.error { margin: 10px 0; color: var(--danger); font-size: 12px; }
+.field-error { display: block; margin-top: 5px; color: var(--danger); font-size: 11px; font-weight: 650; line-height: 1.45; }
+.error-summary { margin: 12px 0; padding: 10px 12px; border: 1px solid #f1c6cc; border-radius: 10px; background: #fff3f4; color: var(--danger); font-size: 12px; line-height: 1.5; }
 .draft-result { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border); }
 .draft-result h3 { font-size: 17px; }
 .draft-result .notice { margin-top: 12px; }

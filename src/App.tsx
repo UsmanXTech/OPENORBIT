@@ -44,12 +44,15 @@ export default function App(){
   const [selected,setSelected]=useState<Asset|null>(null);
   const [walletNotice,setWalletNotice]=useState("No connection request will be sent.");
   const [notice,setNotice]=useState("");
-  const [draftError,setDraftError]=useState("");
+  const [draftErrors,setDraftErrors]=useState({name:"",symbol:"",supply:""});
   const [result,setResult]=useState<LaunchDraft|null>(null);
   const [draft,setDraft]=useState({name:"",symbol:"",supply:"",description:""});
+  const nameInput=useRef<HTMLInputElement>(null);
+  const symbolInput=useRef<HTMLInputElement>(null);
+  const supplyInput=useRef<HTMLInputElement>(null);
   const closeDialog=useCallback(()=>setDialog(null),[]);
   const resetSearchAndFilters=useCallback(()=>{setQuery("");setFilter("all");},[]);
-  const openLaunch=useCallback(()=>{setDraftError("");setResult(null);setDialog("launch");},[]);
+  const openLaunch=useCallback(()=>{setDraftErrors({name:"",symbol:"",supply:""});setResult(null);setDialog("launch");},[]);
   const visible=useMemo(()=>{
     const q=query.trim().toLocaleLowerCase();
     const items=sampleAssets.filter(a=>(a.name+" "+a.symbol).toLocaleLowerCase().includes(q)&&(filter==="all"||a.tag===filter));
@@ -61,10 +64,17 @@ export default function App(){
   const submit=(event:FormEvent<HTMLFormElement>)=>{
     event.preventDefault();
     const name=draft.name.trim(),symbol=draft.symbol.trim().toUpperCase(),supply=Number(draft.supply),description=draft.description.trim();
-    if(!name||!/^[A-Z0-9]{1,10}$/.test(symbol)||!Number.isSafeInteger(supply)||supply<1||supply>1_000_000_000_000_000){
-      setDraftError("Enter a name, a 1–10 character alphanumeric symbol, and a whole-number supply between 1 and 1,000,000,000,000,000.");setResult(null);return;
-    }
-    setDraftError("");setResult({name,symbol,supply,description});
+    const errors={
+      name:name?"":"Enter a token name.",
+      symbol:/^[A-Z0-9]{1,10}$/.test(symbol)?"":"Use 1–10 letters or numbers for the symbol.",
+      supply:draft.supply.trim()===""?"Enter a total supply.":!Number.isSafeInteger(supply)?"Supply must be a whole number.":supply<1||supply>1_000_000_000_000_000?"Supply must be between 1 and 1,000,000,000,000,000.":""
+    };
+    setDraftErrors(errors);
+    setResult(null);
+    if(errors.name){nameInput.current?.focus();return;}
+    if(errors.symbol){symbolInput.current?.focus();return;}
+    if(errors.supply){supplyInput.current?.focus();return;}
+    setResult({name,symbol,supply,description});
   };
   useEffect(()=>{document.title="OPENORBIT — On-chain Launchpad";},[]);
 
@@ -125,11 +135,11 @@ export default function App(){
     <Dialog open={dialog==="launch"} title="Create launch draft" titleId="launchTitle" onClose={closeDialog}>
       <p>Draft settings are for preview only and are not submitted to a blockchain.</p>
       <form onSubmit={submit} noValidate><div className="formgrid">
-        <label>Token name<input value={draft.name} onChange={e=>setDraft({...draft,name:e.target.value})} required maxLength={40} placeholder="e.g. Open Orbit" autoComplete="off"/></label>
-        <label>Token symbol<input value={draft.symbol} onChange={e=>setDraft({...draft,symbol:e.target.value.toUpperCase()})} required maxLength={10} pattern="[A-Za-z0-9]+" placeholder="e.g. ORBT" autoComplete="off"/></label>
-        <label className="full">Total supply<input value={draft.supply} onChange={e=>setDraft({...draft,supply:e.target.value})} type="number" inputMode="numeric" min="1" max="1000000000000000" step="1" required placeholder="1000000000"/></label>
-        <label className="full">Description<input value={draft.description} onChange={e=>setDraft({...draft,description:e.target.value})} maxLength={140} placeholder="What makes your project different?"/></label>
-      </div>{draftError&&<p className="error" role="alert">{draftError}</p>}<button className="btn primary" type="submit" style={{width:"100%"}}>Review draft</button></form>
+        <div className="field-group"><label htmlFor="token-name">Token name</label><input id="token-name" ref={nameInput} value={draft.name} onChange={e=>{setDraft({...draft,name:e.target.value});setDraftErrors(current=>({...current,name:""}));}} aria-invalid={Boolean(draftErrors.name)} aria-describedby={draftErrors.name?"token-name-error":undefined} required maxLength={40} placeholder="e.g. Open Orbit" autoComplete="off"/>{draftErrors.name&&<span id="token-name-error" className="field-error">{draftErrors.name}</span>}</div>
+        <div className="field-group"><label htmlFor="token-symbol">Token symbol</label><input id="token-symbol" ref={symbolInput} value={draft.symbol} onChange={e=>{setDraft({...draft,symbol:e.target.value.toUpperCase()});setDraftErrors(current=>({...current,symbol:""}));}} aria-invalid={Boolean(draftErrors.symbol)} aria-describedby={draftErrors.symbol?"token-symbol-error":undefined} required maxLength={10} pattern="[A-Za-z0-9]+" placeholder="e.g. ORBT" autoComplete="off"/>{draftErrors.symbol&&<span id="token-symbol-error" className="field-error">{draftErrors.symbol}</span>}</div>
+        <div className="field-group full"><label htmlFor="token-supply">Total supply</label><input id="token-supply" ref={supplyInput} value={draft.supply} onChange={e=>{setDraft({...draft,supply:e.target.value});setDraftErrors(current=>({...current,supply:""}));}} aria-invalid={Boolean(draftErrors.supply)} aria-describedby={draftErrors.supply?"token-supply-error":undefined} type="number" inputMode="numeric" min="1" max="1000000000000000" step="1" required placeholder="1000000000"/>{draftErrors.supply&&<span id="token-supply-error" className="field-error">{draftErrors.supply}</span>}</div>
+        <div className="field-group full"><label htmlFor="token-description">Description</label><input id="token-description" value={draft.description} onChange={e=>setDraft({...draft,description:e.target.value})} maxLength={140} placeholder="What makes your project different?"/></div>
+      </div>{Object.values(draftErrors).some(Boolean)&&<p className="error-summary" role="alert">Please fix the highlighted fields before reviewing this draft.</p>}<button className="btn primary" type="submit" style={{width:"100%"}}>Review draft</button></form>
       {result&&<div className="draft-result" aria-live="polite"><h3>Draft ready for review</h3><p>{result.name} ({result.symbol}) · Total supply: {result.supply.toLocaleString()}{result.description?" · "+result.description:""}</p><div className="notice">Saved in this page only. No contract has been generated or deployed.</div><button className="btn" type="button" style={{width:"100%",marginTop:12}} onClick={()=>setResult(null)}>Edit draft</button></div>}
     </Dialog>
     <Dialog open={dialog==="asset"} title={selected?selected.name:"Asset details"} titleId="assetTitle" onClose={closeDialog}>

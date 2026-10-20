@@ -90,3 +90,30 @@ The existing page relies on multiple large gradients, glowing decorative effects
 - Keep all sample metrics explicitly identified as illustrative and all wallet/deployment actions non-live.
 - Preserve keyboard focus, reduced-motion behavior, and readable form errors.
 - Run typecheck, tests, and production build; record actual outcomes and do not claim unrun checks passed.
+
+
+## 2026-10-20 — Accessible launch-draft validation
+
+### Real examples and guidance reviewed before implementation
+
+- **W3C WAI — Validating Input:** https://www.w3.org/WAI/tutorials/forms/validation/  
+  Explains required fields, custom validation, and the need to provide understandable feedback. Transfer: retain application-level validation because the form intentionally uses `noValidate`; do not rely only on browser attributes.
+- **W3C WAI — User Notifications:** https://www.w3.org/WAI/tutorials/forms/notifications/  
+  Recommends specific inline feedback, corrective instructions, programmatic association via `aria-describedby`, and moving focus to the first invalid control after submit. Transfer all four patterns; avoid a single generic message that forces users to guess which field is wrong.
+- **Raydium official LaunchLab creation guide:** https://github.com/raydium-io/raydium-docs-v1/blob/main/user-flows/creating-a-launchlab-token.mdx  
+  The documented flow asks creators to review parameters before approving an irreversible on-chain action. Transfer the explicit review boundary only. OPENORBIT remains a local draft and must not copy live signing, wallet, or deployment behavior.
+- **W3C WCAG 2.2:** https://www.w3.org/TR/WCAG22/  
+  Preserve visible keyboard focus, text-based error cues, and understandable status feedback. Error color is supplementary; each error remains readable text linked to its input.
+
+### Design decision
+
+The launch-draft form previously returned one generic error for three different validation failures. This adds field-level messages for token name, symbol, and total supply; marks invalid inputs with `aria-invalid`; links each message through `aria-describedby`; and moves focus to the first invalid field. Editing a field clears only that field's stale error. A concise alert summary remains for the overall submit failure.
+
+### Acceptance criteria
+
+- Empty submission identifies all required fields and focuses token name first.
+- Invalid symbol and out-of-range supply show actionable field-specific guidance.
+- Each invalid input exposes `aria-invalid="true"` and references its error text.
+- Correcting a field clears its inline error without clearing unrelated errors.
+- Valid input still produces only a local draft; no contract is generated, signed, or deployed.
+- CI type-check, tests, and production build must pass before promotion; browser-only keyboard and narrow viewport checks remain separately reported.
