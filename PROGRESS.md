@@ -28,7 +28,9 @@
 ### Promotion
 
 - Direct commit `c172d1c` pushed to `main` (`ac113d7..c172d1c`) after a fresh fetch; tree clean, no concurrent work, no open PRs, no branch protections bypassed.
-- CI: checking below; Vercel: not touched (read-only; auto-deploys on Vercel's side).
+- CI on `c172d1c`: **success** (run 39398400012).
+- Follow-up docs commit `147ebf8` first failed CI with the known pre-existing slow-runner flake (view-heading 60ms focus timer stole focus mid-typing in "moves keyboard focus to the field when a summary link is activated" — same race as run #8's failure); rerun of the same workflow: **success**. Final CI on main green; no code changed.
+- Vercel: not touched (read-only; auto-deploys on Vercel's side).
 
 
 ## 2026-10-20 — Explore empty-state recovery pass: diagnosis copy + granular recovery actions
