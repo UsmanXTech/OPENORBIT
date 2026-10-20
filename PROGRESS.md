@@ -225,3 +225,33 @@ Files changed: `src/App.tsx`, `src/styles.css`, `src/App.test.tsx`, `UI_UX_RESEA
 ### Next
 
 - Verify CI on the promoted commit; continue the honest no-scroll verification with real pixel measurements when a browser with viewport control is available (or a reachable staging URL); next UX increment candidate: Explore empty-state and toolbar density review.
+
+## 2026-10-20 — Sortable column headers replace the sort select (Explore catalog)
+
+- Starting state: `main` at `2d02a31` (verified with `git fetch origin` + `git log --oneline -3 origin/main`); working tree clean; no open PRs; latest CI on main green.
+- This hour's highest-value improvement: the Explore catalog table now sorts via clickable column headers (Token name, Sample price, Sample market cap), replacing the toolbar sort select and freeing toolbar space. Tri-state cycle per column: first click sorts by domain-default direction (name A–Z; price and market cap highest-first, the crypto-explorer convention), second reverses, third restores the featured order. Reset search/filters also restores featured order; every sort change is announced in the existing `role="status"` live region.
+- Accessibility (MDN `aria-sort` + Carbon data-table, see UI_UX_RESEARCH.md §22–23): button inside `<th>` (W3C APG pattern), `aria-sort` set on the active column only and moved when another column is sorted, arrow indicators `aria-hidden` and revealed on hover/focus or persistently when sorted, Tab + Space/Enter operable, numeric columns right-aligned with tabular numerals.
+- Responsive: on ≤680px (card reflow) the `<thead>` no longer vanishes — sortable headers reflow into a compact pill sort bar above the cards so sorting stays touch-reachable on mobile.
+- Data: added numeric `price` to the sample asset model (values match the displayed `$` labels; illustrative sample data, no live-data claims).
+
+### Verification (real runs, Node)
+
+- `npm run typecheck`: passed (`tsc --noEmit`, no errors).
+- `npm test`: 28/28 passed (15 app + 6 new sort-header tests in `src/App.sort.test.tsx` + 2 search + 5 no-scroll invariants).
+- `npm run build`: passed (production bundle built to `dist/`).
+- Live no-scroll pixel audit: delegated to the browser agent against https://openorbit.vercel.app at 360×640 / 1366×768 / 1920×1080 (per-viewport scroll measurements for all views + detail + empty state). Result pending — will be recorded on delivery; if it finds residual page scroll or clipping, fixes ship in the next run.
+
+### Files changed
+
+- `src/App.tsx` — `sortKey`/`sortDir` state, `cycleSort` tri-state handler, `renderSortTh` header helper, removed sort `<select>`, reset restores featured order, sort announcements.
+- `src/styles.css` — `.sort-btn` header-button styles with hover/focus-revealed indicators; removed `.sort-select`; ≤680px mobile sort-bar reflow.
+- `src/types.ts` — `Asset.price: number`, `AssetSort` gains `"price"`, new `AssetSortDir`.
+- `src/data/assets.ts` — numeric `price` values matching displayed labels.
+- `src/App.sort.test.tsx` (new) — 6 tests: name A–Z + announcement + `aria-sort`, tri-state toggle back to featured, price highest-first, market-cap sort, single-`aria-sort` move between columns, reset restores featured order.
+- `UI_UX_RESEARCH.md` — sessions 22–23 (mandatory per-component research).
+- `PROGRESS.md` — this entry.
+
+### Next
+
+- Record the live audit result; fix any residual page scroll or clipping it finds.
+- Continue the UI/UX redesign priority within the no-scroll shell — e.g. Explore toolbar density review or asset-detail polish.

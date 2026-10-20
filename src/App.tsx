@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { FormEvent, KeyboardEvent as ReactKeyboardEvent } from "react";
 import { sampleAssets } from "./data/assets";
-import type { Asset, AssetFilter, AssetSort, LaunchDraft } from "./types";
+import type { Asset, AssetFilter, AssetSort, AssetSortDir, LaunchDraft } from "./types";
 
 type View = "explore" | "launch" | "wallet" | "guide";
 const views: { id: View; label: string }[] = [
@@ -19,12 +19,27 @@ const filters: { value: AssetFilter; label: string }[] = [
 const tagLabel = (tag: Asset["tag"]) =>
   tag === "trending" ? "Trending" : tag === "new" ? "New" : "Community";
 
+// Sortable columns: default direction follows the domain convention
+// (name A–Z; price and market cap highest-first, as on crypto explorers).
+type SortColumn = "name" | "price" | "cap";
+const sortDefaults: Record<SortColumn, AssetSortDir> = {
+  name: "asc",
+  price: "desc",
+  cap: "desc",
+};
+const sortLabels: Record<SortColumn, string> = {
+  name: "Token name",
+  price: "Sample price",
+  cap: "Sample market cap",
+};
+
 export default function App() {
   const [view, setView] = useState<View>("explore");
   const [announcement, setAnnouncement] = useState("");
   const [filter, setFilter] = useState<AssetFilter>("all");
   const [query, setQuery] = useState("");
-  const [sort, setSort] = useState<AssetSort>("featured");
+  const [sortKey, setSortKey] = useState<AssetSort>("featured");
+  const [sortDir, setSortDir] = useState<AssetSortDir>("desc");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [returnToId, setReturnToId] = useState<string | null>(null);
   const [walletNotice, setWalletNotice] = useState("No connection request will be sent.");
@@ -107,7 +122,66 @@ export default function App() {
   const resetSearchAndFilters = useCallback(() => {
     setQuery("");
     setFilter("all");
+    setSortKey("featured");
   }, []);
+
+  // Tri-state column sort (Carbon data-table pattern): first click sorts by
+  // the column default, second reverses, third restores featured order.
+  const cycleSort = useCallback(
+    (col: SortColumn) => {
+      let nextKey: AssetSort = col;
+      let nextDir: AssetSortDir = sortDefaults[col];
+      if (sortKey === col) {
+        if (sortDir === sortDefaults[col]) {
+          nextDir = sortDir === "asc" ? "desc" : "asc";
+        } else {
+          nextKey = "featured";
+        }
+      }
+      setSortKey(nextKey);
+      setSortDir(nextDir);
+      setAnnouncement(
+        nextKey === "featured"
+          ? "Sorting cleared. Showing featured order."
+          : `Sorted by ${sortLabels[col]}, ${
+              nextDir === "asc" ? "ascending" : "descending"
+            }.`
+      );
+    },
+    [sortKey, sortDir]
+  );
+
+  // Sortable column header: button inside <th> (W3C APG pattern), aria-sort
+  // on the active column only, arrow indicator aria-hidden.
+  const renderSortTh = (col: SortColumn, label: string, numeric = false) => {
+    const active = sortKey === col;
+    const stateText = !active
+      ? "not sorted"
+      : sortDir === "asc"
+        ? "sorted ascending"
+        : "sorted descending";
+    return (
+      <th
+        scope="col"
+        className={"sortable" + (numeric ? " num" : "")}
+        aria-sort={
+          active ? (sortDir === "asc" ? "ascending" : "descending") : undefined
+        }
+      >
+        <button
+          type="button"
+          className="sort-btn"
+          onClick={() => cycleSort(col)}
+          aria-label={`Sort by ${sortLabels[col]}, currently ${stateText}`}
+        >
+          <span className="sort-label">{label}</span>
+          <span className="sort-icon" aria-hidden="true">
+            {active ? (sortDir === "asc" ? "↑" : "↓") : "↕"}
+          </span>
+        </button>
+      </th>
+    );
+  };
 
   const visible = useMemo(() => {
     const q = query.trim().toLocaleLowerCase();
@@ -116,11 +190,14 @@ export default function App() {
         (a.name + " " + a.symbol).toLocaleLowerCase().includes(q) &&
         (filter === "all" || a.tag === filter)
     );
-    if (sort === "name") items.sort((a, b) => a.name.localeCompare(b.name));
-    if (sort === "cap") items.sort((a, b) => b.marketCap - a.marketCap);
+    const dir = sortDir === "asc" ? 1 : -1;
+    if (sortKey === "name") items.sort((a, b) => dir * a.name.localeCompare(b.name));
+    if (sortKey === "price") items.sort((a, b) => dir * (a.price - b.price));
+    if (sortKey === "cap") items.sort((a, b) => dir * (a.marketCap - b.marketCap));
     return items;
-  }, [filter, query, sort]);
-  const hasActiveFilters = query.trim().length > 0 || filter !== "all";
+  }, [filter, query, sortKey, sortDir]);
+  const hasActiveFilters =
+    query.trim().length > 0 || filter !== "all" || sortKey !== "featured";
 
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -375,16 +452,6 @@ export default function App() {
                       </button>
                     )}
                   </div>
-                  <select
-                    className="field sort-select"
-                    value={sort}
-                    onChange={(e) => setSort(e.target.value as AssetSort)}
-                    aria-label="Sort assets"
-                  >
-                    <option value="featured">Sort: Featured</option>
-                    <option value="name">Name A–Z</option>
-                    <option value="cap">Market cap</option>
-                  </select>
                   {hasActiveFilters && (
                     <button
                       className="reset-controls"
@@ -422,14 +489,10 @@ export default function App() {
                     <table className="token-table">
                       <thead>
                         <tr>
-                          <th scope="col">Token</th>
+                          {renderSortTh("name", "Token")}
                           <th scope="col">Category</th>
-                          <th scope="col" className="num">
-                            Sample price
-                          </th>
-                          <th scope="col" className="num">
-                            Sample market cap
-                          </th>
+                          {renderSortTh("price", "Sample price", true)}
+                          {renderSortTh("cap", "Sample market cap", true)}
                           <th scope="col">Listing</th>
                           <th scope="col">
                             <span className="sr-only">Actions</span>

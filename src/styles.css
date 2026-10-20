@@ -126,8 +126,26 @@ h2, h3 { letter-spacing: -.045em; }
 .search-icon { position: absolute; left: 13px; top: 50%; width: 17px; height: 17px; transform: translateY(-50%); color: var(--subtle); pointer-events: none; }
 .clear-search { position: absolute; top: 50%; right: 7px; display: grid; place-items: center; width: 30px; height: 30px; transform: translateY(-50%); border: 0; border-radius: 8px; background: transparent; color: var(--muted); font-size: 20px; line-height: 1; }
 .clear-search:hover { background: var(--surface-soft); color: var(--text); }
-.sort-select { flex: none; width: auto; }
 .results-count { margin: 0; color: var(--muted); font-size: 11px; white-space: nowrap; }
+
+/* Sortable column headers (Carbon data-table pattern): the sort control is a
+   button inside the <th>; the arrow indicator appears on hover/focus and
+   persists on the actively sorted column (aria-sort). Numeric headers keep
+   their right alignment per Primer/data-table guidance. */
+.token-table th.sortable { padding: 0; }
+.sort-btn {
+  display: inline-flex; align-items: center; gap: 6px; width: 100%;
+  border: 0; border-radius: 6px; background: transparent;
+  padding: 10px 14px; color: var(--subtle);
+  font-size: 10px; font-weight: 750; letter-spacing: .07em; text-transform: uppercase;
+  white-space: nowrap;
+}
+.token-table th.num .sort-btn { justify-content: flex-end; }
+.sort-btn:hover { color: var(--text); background: #efede9; }
+.sort-btn .sort-icon { opacity: 0; font-size: 11px; line-height: 1; transition: opacity .15s ease; }
+.sort-btn:hover .sort-icon, .sort-btn:focus-visible .sort-icon { opacity: .5; }
+.token-table th[aria-sort] .sort-btn { color: var(--text); }
+.token-table th[aria-sort] .sort-icon { opacity: 1; color: var(--accent); }
 .reset-controls { flex: none; border: 0; border-radius: 8px; padding: 7px 9px; background: transparent; color: var(--accent-hover); font-size: 11px; font-weight: 750; text-decoration: underline; text-underline-offset: 3px; }
 .reset-controls:hover { background: var(--accent-soft); }
 
@@ -257,8 +275,21 @@ h2, h3 { letter-spacing: -.045em; }
   .explore-head { align-items: start; flex-direction: column; gap: 4px; }
   .toolbar { flex-wrap: wrap; }
   .sort-select { flex: 1; }
-  /* Token table becomes compact cards on narrow screens. */
-  .token-table thead { display: none; }
+  /* Token table becomes compact cards on narrow screens; the sortable
+     headers reflow into a compact sort bar above the cards so sorting stays
+     reachable after the toolbar sort select was removed. */
+  .token-table thead { display: block; }
+  .token-table thead tr { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 12px 4px; }
+  .token-table th { display: none; }
+  .token-table th.sortable { display: block; padding: 0; }
+  .token-table th.sortable .sort-btn {
+    border: 1px solid var(--border); border-radius: 999px; background: var(--surface-soft);
+    padding: 7px 11px; font-size: 11px; text-transform: none; letter-spacing: 0; font-weight: 700;
+    justify-content: flex-start;
+  }
+  .token-table th.sortable .sort-btn .sort-icon { opacity: .55; }
+  .token-table th.sortable .sort-btn:hover .sort-icon,
+  .token-table th.sortable .sort-btn:focus-visible .sort-icon { opacity: 1; }
   .token-table, .token-table tbody, .token-table tr, .token-table td { display: block; width: 100%; }
   .token-table tbody tr { border-bottom: 1px solid var(--border); padding: 8px 4px; }
   .token-table tbody td { border: 0; padding: 2px 12px; }

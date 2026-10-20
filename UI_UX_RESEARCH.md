@@ -253,6 +253,23 @@ The launch-draft form previously returned one generic error for three different 
     - Why it suits OPENORBIT: it gives the honest-limit documentation a normative anchor — internal panel scroll on short viewports is standards-consistent for data tables.
     - Accessibility/responsive implications: no horizontal page overflow anywhere (all panels constrain to viewport width; tablist scrolls horizontally only within the fixed header); text reflows to a single column at ≤680px (card rows, stacked form, single-column steps), so 400%-zoom-equivalent widths remain operable.
 
+22. **MDN — ARIA: `aria-sort` attribute**
+    https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-sort
+    - Patterns observed: when a table is sortable, `aria-sort` is set to `ascending`/`descending` on the header cell of the sorted column ONLY (single attribute at a time; it is moved to the newly sorted column, never duplicated); the header text sits inside a `<button>` within the `<th>` so the control is keyboard-reachable; the visual arrow is a CSS/`aria-hidden` detail.
+    - What transfers: the button-inside-`<th>` markup, the single-`aria-sort` contract, click-toggles-direction on the same column.
+    - What does not transfer: MDN's toggle example flips only ascending↔descending — OPENORBIT needs a path back to the curated "Featured" order, so a third click clears sorting (tri-state cycle), which Carbon's three-state model (unsorted/sorted-up/sorted-down) supports.
+    - Why it suits OPENORBIT: one screen of 6 sample rows; headers are the natural sort affordance on desktop, replacing the toolbar select and freeing toolbar space for search.
+    - Accessibility/responsive implications: button-in-th is reachable by Tab and operable with Space/Enter (Carbon's stated keyboard contract); live-region announcements on every sort change (`aria-sort` alone is silent on change); on ≤680px the `<thead>` becomes a visible flex row of sort pills instead of `display:none`, so the control never disappears on the card reflow.
+
+23. **Carbon Design System — Data table usage + accessibility**
+    https://v10.carbondesignsystem.com/components/data-table/usage/
+    https://v10.carbondesignsystem.com/components/data-table/accessibility/
+    - Patterns observed: sort controls live in the column headers; the arrow icon is hidden until hover/focus and persists once sorted; three states (unsorted / sorted-up / sorted-down); sortable headers are Tab-reachable and sortable with Space/Enter; numeric columns right-align with tabular numerals; no persistent visual indicator that a table is sortable, so designers annotate.
+    - What transfers: header-embedded sort controls with hover/focus-revealed arrows, three states (none/asc/desc), numeric right-alignment (already present via `.num`), Tab + Space/Enter keyboard contract.
+    - What does not transfer: Carbon's React-table header-object API (framework machinery, not UX); its paginated/advanced table variants (not needed for 6 rows).
+    - Why it suits OPENORBIT: matches the dense Uniswap-style token table already in the Explore view; the arrow-reveal keeps the single-screen header row clean while making sortability discoverable.
+    - Accessibility/responsive implications: hover-only reveals would exclude touch/keyboard — the indicator also shows on `:focus-visible` and permanently on the sorted column; `aria-sort` programmatically matches the visual indicator (Carbon's stated requirement); the mobile sort-bar keeps the ≤680px card reflow fully sortable by touch.
+
 ### Honest limitations
 
 - Internal scroll fallback: `.tablewrap`, the launch grid, the asset-detail panel, and now `.guide-view` use `overflow-y: auto` inside the fixed-height shell. On typical viewports (≥620px height) nothing scrolls; on very short viewports the panel scrolls internally while the page itself never scrolls. This is the documented last resort the design rule allows; desktop and most mobile portrait heights render fully scroll-free.
