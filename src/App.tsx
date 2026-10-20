@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { FormEvent, KeyboardEvent as ReactKeyboardEvent } from "react";
+import type { FormEvent, KeyboardEvent as ReactKeyboardEvent, MouseEvent as ReactMouseEvent } from "react";
 import { sampleAssets } from "./data/assets";
 import type { Asset, AssetFilter, AssetSort, AssetSortDir, LaunchDraft } from "./types";
 
@@ -255,6 +255,45 @@ export default function App() {
     }
     setResult({ name, symbol, supply, description });
   };
+
+  // Error-summary links must move keyboard focus to the field they describe
+  // (GOV.UK error-summary pattern). A plain href="#id" cannot do this reliably
+  // in the no-scroll shell, so the handler focuses the field explicitly.
+  const focusLaunchField = (fieldId: string) => {
+    if (fieldId === "token-name") nameInput.current?.focus();
+    else if (fieldId === "token-symbol") symbolInput.current?.focus();
+    else if (fieldId === "token-supply") supplyInput.current?.focus();
+  };
+  const jumpToField = (
+    event: ReactMouseEvent<HTMLAnchorElement>,
+    fieldId: string,
+  ) => {
+    event.preventDefault();
+    focusLaunchField(fieldId);
+  };
+  const renderErrorSummaryLink = (fieldId: string, message: string) =>
+    message ? (
+      <li>
+        <a href={`#${fieldId}`} onClick={(e) => jumpToField(e, fieldId)}>
+          {message}
+        </a>
+      </li>
+    ) : null;
+  const renderErrorSummary = () =>
+    Object.values(draftErrors).some(Boolean) ? (
+      <div className="error-summary" role="alert">
+        <strong>There is a problem</strong>
+        <p>
+          Please fix the highlighted fields before reviewing this draft, or
+          select a problem to jump to the field.
+        </p>
+        <ul className="error-summary-list">
+          {renderErrorSummaryLink("token-name", draftErrors.name)}
+          {renderErrorSummaryLink("token-symbol", draftErrors.symbol)}
+          {renderErrorSummaryLink("token-supply", draftErrors.supply)}
+        </ul>
+      </div>
+    ) : null;
 
   useEffect(() => {
     document.title = "OPENORBIT — On-chain Launchpad";
@@ -612,6 +651,7 @@ export default function App() {
                   Draft settings are for preview only and are not submitted to a
                   blockchain.
                 </p>
+                {renderErrorSummary()}
                 <form
                   onSubmit={submit}
                   noValidate
@@ -722,32 +762,6 @@ export default function App() {
                       />
                     </div>
                   </div>
-                  {Object.values(draftErrors).some(Boolean) && (
-                    <div className="error-summary" role="alert">
-                      <strong>There is a problem</strong>
-                      <p>
-                        Please fix the highlighted fields before reviewing this
-                        draft, or select a problem to jump to the field.
-                      </p>
-                      <ul className="error-summary-list">
-                        {draftErrors.name && (
-                          <li>
-                            <a href="#token-name">{draftErrors.name}</a>
-                          </li>
-                        )}
-                        {draftErrors.symbol && (
-                          <li>
-                            <a href="#token-symbol">{draftErrors.symbol}</a>
-                          </li>
-                        )}
-                        {draftErrors.supply && (
-                          <li>
-                            <a href="#token-supply">{draftErrors.supply}</a>
-                          </li>
-                        )}
-                      </ul>
-                    </div>
-                  )}
                   <button
                     className="btn primary"
                     type="submit"

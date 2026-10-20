@@ -1,5 +1,30 @@
 # Engineering progress
 
+## 2026-10-20 — Launch error-summary upgrade: above-the-form placement + focus-moving links
+
+- Starting state: `main` at `310f188` (verified with `git fetch origin` + `git log --oneline -3 origin/main`); working tree clean; no open PRs; latest CI on main green.
+- This hour's highest-value improvement: the Launch draft form's error summary now follows the GOV.UK error-summary pattern — it renders ABOVE the form fields (previously it sat below them, just before the submit button), and each summary link now moves keyboard focus to its field explicitly via the field refs. The old plain `href="#id"` anchors could not reliably do this in the no-scroll shell; the links keep their `href`s for semantics but their click handlers `preventDefault()` and focus the input. First-invalid-field focus on submit is unchanged (tested contract), so no behavior regresses; the summary's wording still matches the inline errors verbatim per the GOV.UK rule, `role="alert"` is preserved, and `aria-invalid`/`aria-describedby` associations are untouched.
+- Research (mandatory per-component; UI_UX_RESEARCH.md §28–29): GOV.UK Error summary component (page opened directly) — summary at top of page, "There is a problem" heading, link each error to its field, move focus appropriately; focus-to-summary-on-submit deliberately NOT transferred (would fight the established first-invalid-field focus contract and its slow-runner race history). Carbon Forms usage — informative validation labels, summary-as-general-statement slot, keep-data-on-error; on-blur real-time validation not transferred (form validates on submit so fields can be filled in any order).
+- Tests: 2 new tests in `src/App.test.tsx` — (1) the error summary precedes the form in DOM order, (2) activating the "Enter a total supply." summary link moves focus to the supply field. Existing summary tests (link hrefs, first-field focus, role="alert") all still pass unchanged.
+
+### Verification (real runs, Node)
+
+- `npm run typecheck`: passed (`tsc --noEmit`, no errors).
+- `npm test`: 33/33 passed, verified twice consecutively (first run showed the known pre-existing slow-runner flake once — 1 failure — then 33/33 twice; not caused by the change).
+- `npm run build`: passed (production bundle built to `dist/`).
+
+### Files changed
+
+- `src/App.tsx` — `renderErrorSummary()` helper (summary block above the `<form>`), `renderErrorSummaryLink` link factory, `focusLaunchField` + `jumpToField` handlers; removed the old inline summary from inside the form.
+- `src/App.test.tsx` — 2 new tests (summary placement, link focus).
+- `UI_UX_RESEARCH.md` — sessions 28–29 (mandatory per-component research).
+- `PROGRESS.md` — this entry.
+
+### Next
+
+- Wallet view honest-status redesign (it is the least polished view; keep it inline and clearly preview-only, no real connections).
+- Continue no-scroll structural audits as views change; pixel-measured live audit still blocked at tooling level.
+
 ## 2026-10-20 — Asset detail hierarchy polish (identity header + two KPI cards)
 
 - Starting state: `main` at `67ebc7b` (verified with `git fetch origin` + `git log --oneline -3 origin/main`); working tree clean; no open PRs; latest CI on main green.

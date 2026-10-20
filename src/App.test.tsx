@@ -118,6 +118,22 @@ describe("OPENORBIT marketplace preview",()=>{
   expect(nameLink).toHaveAttribute("href","#token-name");
   expect(supplyLink).toHaveAttribute("href","#token-supply");
  });
+ it("places the error summary above the form fields, not below them",async()=>{
+  const user=userEvent.setup(); render(<App />);
+  await user.click(screen.getByRole("tab",{name:"Launch"}));
+  await user.click(screen.getByRole("button",{name:"Review draft"}));
+  const alert=screen.getByRole("alert");
+  const form=screen.getByRole("form",{name:"Create launch draft form"});
+  expect(alert.compareDocumentPosition(form) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+ });
+ it("moves keyboard focus to the field when a summary link is activated",async()=>{
+  const user=userEvent.setup(); render(<App />);
+  await user.click(screen.getByRole("tab",{name:"Launch"}));
+  await user.click(screen.getByRole("button",{name:"Review draft"}));
+  const alert=screen.getByRole("alert");
+  await user.click(within(alert).getByRole("link",{name:"Enter a total supply."}));
+  expect(screen.getByRole("spinbutton",{name:"Total supply"})).toHaveFocus();
+ });
  it("reviews a launch draft without deploying it",async()=>{
   const user=userEvent.setup(); render(<App />);
   await user.click(screen.getByRole("tab",{name:"Launch"}));
