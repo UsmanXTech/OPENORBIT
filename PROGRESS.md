@@ -508,7 +508,7 @@ Files changed: `src/App.tsx` (seg refs, `onFilterKeyDown`, roving tabindex, Esca
 
 ### Promotion
 
-- Direct commit pushed to `main` after a fresh fetch (tree clean, no concurrent work, no open PRs); CI green on the promoted commit (verified via `gh run list` after push); Vercel not touched (read-only).
+- Direct commit `91c08cc` pushed to `main` (`18178bb..91c08cc`) after a fresh fetch (tree clean, no concurrent work, no open PRs); CI run 39409345414 on `91c08cc`: **success** (typecheck + all tests + build, 25s); Vercel not touched (read-only).
 
 ### Next
 
