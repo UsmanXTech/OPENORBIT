@@ -270,6 +270,22 @@ The launch-draft form previously returned one generic error for three different 
     - Why it suits OPENORBIT: matches the dense Uniswap-style token table already in the Explore view; the arrow-reveal keeps the single-screen header row clean while making sortability discoverable.
     - Accessibility/responsive implications: hover-only reveals would exclude touch/keyboard — the indicator also shows on `:focus-visible` and permanently on the sorted column; `aria-sort` programmatically matches the visual indicator (Carbon's stated requirement); the mobile sort-bar keeps the ≤680px card reflow fully sortable by touch.
 
+24. **Carbon Design System — Content switcher usage (fetched directly)**
+    https://www.carbondesignsystem.com/components/content-switcher/usage/
+    - Patterns observed: three height sizes (small 32px, medium 40px, large 48px) — "choose a size that best fits your layout's density"; each content tab the same fixed width (widths derive from the longest label, never stretched proportionally); labels 2–3 words, nouns or noun phrases; the switcher sits above the content it controls, aligned with content, never centered; keyboard contract — Tab into the group, then Left/Right arrows move focus between tabs (with wrap), Home/End to the ends, with automatic or manual activation; exactly one tab is always selected.
+    - What transfers: the whole contract — the 40px medium baseline shared by the switcher, search field, and reset control; equal-width filter tabs (realized as equal `flex:1` shares, Carbon's proportional equivalent for an auto-width container); arrow-key navigation with wrap + Home/End and auto-activation; the concise noun labels (All / New / Trending) already matched.
+    - What does not transfer: Carbon's fixed-pixel tab widths from the longest label (container width is fluid here, so equal flex shares are the honest equivalent); Carbon's high/low-contrast switcher colorways (OPENORBIT keeps its pill styling); manual-activation mode (auto-activation chosen to match the top-level view tabs' existing model, keeping one interaction language).
+    - Why it suits OPENORBIT: the category control IS a content switcher ("narrow large content groups") sitting above the table it filters; a shared 40px baseline is what makes the toolbar read as one dense row inside the no-scroll single screen.
+    - Accessibility/responsive implications: roving tabindex keeps the group to a single Tab stop; arrow keys are discoverable via the same affordance as the view tabs; on ≤680px the switcher takes the first full row of the stacked toolbar so all 40px touch targets survive.
+
+25. **Carbon Design System — Search usage (fetched directly)**
+    https://www.carbondesignsystem.com/components/search/usage/
+    - Patterns observed: four sizes (xs 24 / sm 32 / md 40 / lg 48) — "use consistent component sizes throughout a layout to maintain alignment and visual harmony"; magnifier icon as the universal search signifier; a close 'x' appears only after the user starts typing; Enter submits, Esc clears the field; the close icon itself is a button operable with Space/Enter.
+    - What transfers: the 40px medium height shared with the switcher (the consistency rule is the whole point of this density pass); Escape-to-clear added to the input (the × button already existed).
+    - What does not transfer: the fluid style (in-field stacked label — noise in a one-row toolbar); the large 48px size (too tall for the dense single-screen view).
+    - Why it suits OPENORBIT: search is the primary discovery control for the catalog; sharing the exact baseline with the switcher and reset link is what eliminates the previous ragged toolbar.
+    - Accessibility/responsive implications: Escape-to-clear means keyboard users never have to Tab-hunt the ×; the 40px height preserves comfortable targets; on ≤680px the search wraps to its own full-width row below the switcher.
+
 ### Honest limitations
 
 - Internal scroll fallback: `.tablewrap`, the launch grid, the asset-detail panel, and now `.guide-view` use `overflow-y: auto` inside the fixed-height shell. On typical viewports (≥620px height) nothing scrolls; on very short viewports the panel scrolls internally while the page itself never scrolls. This is the documented last resort the design rule allows; desktop and most mobile portrait heights render fully scroll-free.

@@ -260,3 +260,22 @@ Files changed: `src/App.tsx`, `src/styles.css`, `src/App.test.tsx`, `UI_UX_RESEA
 
 - Record the live audit result; fix any residual page scroll or clipping it finds.
 - Continue the UI/UX redesign priority within the no-scroll shell — e.g. Explore toolbar density review or asset-detail polish.
+
+## 2026-10-20 — Explore toolbar density pass: shared 40px baseline + filter keyboard contract
+
+- Starting state: `main` at `3fb7c3c` (verified with `git fetch origin` + `git log --oneline -3 origin/main`); working tree clean; no open PRs; latest CI on main green.
+- This hour's highest-value improvement (the "Explore toolbar density review" item from run #8): the Explore toolbar now shares one 40px control baseline — category switcher, search field, and reset control all align on a single row instead of the previous ragged heights (34px tabs / 38px field). Filter tabs are equal-width (`flex:1`, Carbon content-switcher pattern); on ≤680px the toolbar stacks cleanly: full-width filter row, then a full-width search row, preserving 40px touch targets.
+- Keyboard contract for the category filter group (Carbon content-switcher): Tab into the group, Left/Right arrows move focus with wrap and auto-activate the focused tab, Home/End jump to the ends; roving tabindex keeps it to one Tab stop. Search gains Escape-to-clear (Carbon search pattern) alongside the existing × button.
+- Research (mandatory per-component; UI_UX_RESEARCH.md §24–25, fetched directly this run): Carbon Content switcher usage — 32/40/48px size ladder, equal-width tabs, Left/Right arrow navigation with auto/manual activation, always-one-selected; Carbon Search usage — consistent component sizes for layout harmony, md 40px, Esc clears the field.
+
+### Verification (real runs, Node)
+
+- `npm run typecheck`: passed (`tsc --noEmit`, no errors).
+- `npm test`: 30/30 passed (15 app + 6 sort + 4 search — 2 new: Escape-clears-search, filter arrow-key navigation with auto-activation/wrap — + 5 no-scroll invariants).
+- `npm run build`: passed (production bundle built to `dist/`).
+
+Files changed: `src/App.tsx` (seg refs, `onFilterKeyDown`, roving tabindex, Escape handler), `src/styles.css` (40px baseline, equal tabs, stacked mobile toolbar), `src/App.search.test.tsx` (2 new tests), `UI_UX_RESEARCH.md` (§24–25), `PROGRESS.md` (this entry).
+
+### Next
+
+- Verify CI on the promoted commit; asset-detail polish (spacing/typography hierarchy in the inline detail page) remains the next UX candidate after the toolbar work lands.

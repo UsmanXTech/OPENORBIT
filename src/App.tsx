@@ -53,6 +53,7 @@ export default function App() {
   const supplyInput = useRef<HTMLInputElement>(null);
   const connectBtn = useRef<HTMLButtonElement>(null);
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const segRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const headingRefs = useRef<Record<View, HTMLHeadingElement | null>>({
     explore: null,
     launch: null,
@@ -85,6 +86,25 @@ export default function App() {
       activate(views[next].id, false);
     },
     [activate]
+  );
+
+  // Category filter segmented control: Carbon content-switcher keyboard
+  // contract — Left/Right arrows move focus and auto-activate the newly
+  // focused tab, with wrap; Home/End jump to the ends.
+  const onFilterKeyDown = useCallback(
+    (event: ReactKeyboardEvent<HTMLButtonElement>, index: number) => {
+      let next: number | null = null;
+      if (event.key === "ArrowRight") next = (index + 1) % filters.length;
+      else if (event.key === "ArrowLeft")
+        next = (index - 1 + filters.length) % filters.length;
+      else if (event.key === "Home") next = 0;
+      else if (event.key === "End") next = filters.length - 1;
+      if (next === null) return;
+      event.preventDefault();
+      setFilter(filters[next].value);
+      segRefs.current[next]?.focus();
+    },
+    []
   );
 
   const openDetail = useCallback((a: Asset) => {
@@ -401,13 +421,18 @@ export default function App() {
                     role="group"
                     aria-label="Filter assets"
                   >
-                    {filters.map((f) => (
+                    {filters.map((f, i) => (
                       <button
                         key={f.value}
+                        ref={(el) => {
+                          segRefs.current[i] = el;
+                        }}
                         className={"tab" + (filter === f.value ? " active" : "")}
                         type="button"
                         aria-pressed={filter === f.value}
+                        tabIndex={filter === f.value ? 0 : -1}
                         onClick={() => setFilter(f.value)}
+                        onKeyDown={(e) => onFilterKeyDown(e, i)}
                       >
                         {f.label}
                       </button>
@@ -438,6 +463,9 @@ export default function App() {
                       className="field"
                       value={query}
                       onChange={(e) => setQuery(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Escape") setQuery("");
+                      }}
                       placeholder="Search by name or symbol…"
                       aria-label="Search assets"
                     />
