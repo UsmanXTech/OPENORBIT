@@ -117,3 +117,25 @@ The launch-draft form previously returned one generic error for three different 
 - Correcting a field clears its inline error without clearing unrelated errors.
 - Valid input still produces only a local draft; no contract is generated, signed, or deployed.
 - CI type-check, tests, and production build must pass before promotion; browser-only keyboard and narrow viewport checks remain separately reported.
+
+
+## 2026-10-20 — Structured asset-detail dialog
+
+### Real references reviewed before implementation
+
+8. **W3C WAI-ARIA APG — Dialog (Modal) Pattern**
+   https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/
+   - Patterns observed: on open, focus moves inside the dialog; Tab/Shift+Tab stay trapped; Escape closes; focus returns to the invoking element; a visible button that closes the dialog is strongly recommended; container has `role=dialog`, `aria-modal="true"`, `aria-labelledby` on the visible title; when content holds semantic structures (lists, paragraphs), initial focus may target a static element at the top so content is not announced as one unbroken string and not scrolled out of view.
+   - What transfers: the existing focus trap, focus restoration, Escape handling, and the visible × close button were kept unchanged. A second explicit "Back to catalog" close button was added, matching the APG recommendation of a visible closing action. Initial focus remains on the close control — the dialog is short enough that content does not scroll out of view, so the APG's static-element condition does not apply.
+   - What does not transfer: `aria-describedby` on the dialog container (APG advises omitting it when content has semantic structures like lists).
+   - Why it suits OPENORBIT: the asset dialog is now structured and informational; keeping it a true modal with focus discipline keeps it keyboard- and screen-reader-friendly.
+   - Accessibility/responsive implications: stats are exposed as a `<dl>` with `<dt>`/`<dd>` pairs (machine-readable labeled pairs); the modal already scrolls within `max-height: 85vh`; existing `focus-visible`, reduced-motion, and narrow-viewport styles are untouched.
+
+9. **Uniswap Support — "What is the Token Details page?"**
+   http://support.uniswap.org/hc/en-us/articles/9818052307341-What-is-the-Token-Details-page
+   - Limitation recorded honestly: the live app page (https://app.uniswap.org/explore/tokens) is a JavaScript bundle and timed out on text fetch; the reference was read from Uniswap's official support documentation instead.
+   - Patterns observed: a token detail page = identity header, price graph, a Stats section (TVL, market cap, FDV, 1-day volume), Transactions, Pools, and an Info section (description + links).
+   - What transfers: structured sections — identity header (icon, name, symbol, badge), a labeled stats grid, an "About this listing" description section, and an honest no-live-data notice. Every figure is labeled "Sample".
+   - What does not transfer: live price charts, transactions, pools, swap/buy CTAs, branding, or any implication that OPENORBIT has real market data.
+   - Why it suits OPENORBIT: a catalog detail view benefits from quick-scan stats plus an about section — it matches the discovery mental model of a real product without copying its look or implying its capabilities.
+   - Accessibility/responsive implications: clear heading hierarchy, definition-list stats, and the modal's existing responsive behavior.

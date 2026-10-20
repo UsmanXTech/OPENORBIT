@@ -156,6 +156,16 @@ h3 { margin: 0 0 3px; font-size: 14px; font-weight: 750; letter-spacing: -.02em;
 .modal { width: min(100%, 520px); max-height: min(85vh, 760px); overflow-y: auto; padding: 24px; border: 1px solid rgba(255,255,255,.65); border-radius: 20px; background: var(--surface); box-shadow: 0 30px 100px rgba(10,10,20,.24); }
 .modalhead { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .modalhead h2 { margin: 0; font-size: 23px; }
+.asset-detail { display: flex; flex-direction: column; gap: 14px; }
+.asset-detail-head { display: flex; align-items: center; gap: 12px; margin-top: 4px; }
+.asset-detail-head > div:nth-child(2) { min-width: 0; flex: 1; }
+.asset-detail-head .coin { width: 52px; height: 52px; font-size: 19px; }
+.detail-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0; }
+.detail-stats > div { padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface-soft); }
+.detail-stats dt { color: var(--subtle); font-size: 10px; font-weight: 750; letter-spacing: .07em; text-transform: uppercase; }
+.detail-stats dd { margin: 5px 0 0; color: var(--text); font-size: 15px; font-weight: 750; letter-spacing: -.02em; }
+.detail-about h3 { font-size: 12px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; color: var(--subtle); }
+.detail-about p { margin: 8px 0 0; color: var(--text); font-size: 13px; }
 .x { width: 35px; height: 35px; flex: none; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-soft); color: var(--text); font-size: 20px; }
 .walletopt { display: flex; align-items: center; gap: 12px; width: 100%; margin: 10px 0; padding: 13px; border: 1px solid var(--border); border-radius: 12px; background: white; color: var(--text); text-align: left; }
 .walletopt:hover { border-color: #c7bcff; background: #fbfaff; }

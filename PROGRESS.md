@@ -107,3 +107,14 @@ Next milestones:
 ### Safety boundary
 
 - No wallet connection, contract generation, deployment, trade, or chain action touched; no secrets added; nothing deployed to Vercel.
+
+
+## 2026-10-20 — Hourly autonomous run (07:41 PKT)
+
+- Starting state: `main` at `f128339` (verified with `git fetch origin` + `git log --oneline -3 origin/main`); working tree clean; no open PRs (PRs #1–#3 all merged; latest CI on main green).
+- This hour's highest-value improvement: the asset-detail dialog ("View details") was rebuilt from a single bare paragraph into a structured detail view — identity header (coin icon, name, symbol, category, listing badge), a "Sample stats" definition list (Sample price, Sample market cap, Category, Listing), an "About this listing" section, the illustrative-data notice, and a "Back to catalog" close button. All market figures remain explicitly labeled as samples; no wallet, live-chain, or trade functionality is implied (safety boundary unchanged).
+- Research (mandatory per-component; recorded in `UI_UX_RESEARCH.md` with all five decision points): (1) W3C WAI-ARIA APG Dialog (Modal) Pattern (https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/) — fetched directly; validated keeping the existing focus trap/restoration/Escape and adding an explicit close button; (2) Uniswap "What is the Token Details page?" support doc (http://support.uniswap.org/hc/en-us/articles/9818052307341-What-is-the-Token-Details-page) — transferred the identity-header + stats-section + info-section structure with every figure sample-labeled; the live app page (app.uniswap.org/explore/tokens) is a JS bundle and timed out on text fetch, limitation recorded.
+- Files changed: `src/App.tsx` (asset dialog markup), `src/styles.css` (asset-detail, detail-stats, detail-about styles), `src/App.test.tsx` (2 new regression tests), `UI_UX_RESEARCH.md` (research record), `PROGRESS.md` (this entry).
+- Verification (real runs, Node 24, same pinned lockfile): `npm run typecheck` passed; `npm test` 12/12 passed (was 10/10 before this run); `npm run build` passed.
+- Promotion: direct commit + push to `main` after a fresh `git fetch origin`; promotion status verified below (CI run on the new main head).
+- Next run: consider keyboard/announcement feedback for sort changes in the catalog (screen-reader users currently get no announcement when the sort order changes), plus a responsive check of the new dialog on narrow viewports.

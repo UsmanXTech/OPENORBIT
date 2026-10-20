@@ -143,7 +143,13 @@ export default function App(){
       {result&&<div className="draft-result" aria-live="polite"><h3>Draft ready for review</h3><p>{result.name} ({result.symbol}) · Total supply: {result.supply.toLocaleString()}{result.description?" · "+result.description:""}</p><div className="notice">Saved in this page only. No contract has been generated or deployed.</div><button className="btn" type="button" style={{width:"100%",marginTop:12}} onClick={()=>setResult(null)}>Edit draft</button></div>}
     </Dialog>
     <Dialog open={dialog==="asset"} title={selected?selected.name:"Asset details"} titleId="assetTitle" onClose={closeDialog}>
-      {selected&&<><p>{selected.description} Symbol: {selected.symbol}. Sample market cap: {selected.marketCapLabel}. No live chain data is connected.</p><div className="notice">Listing metrics are illustrative only. Trading is disabled in this preview.</div></>}
+      {selected&&<div className="asset-detail">
+        <div className="asset-detail-head"><div className={"coin "+selected.color} aria-hidden="true">{selected.initial}</div><div><h3>{selected.name}</h3><div className="symbol">{selected.symbol} · {selected.category}</div></div><span className="badge">{tagLabel(selected.tag)}</span></div>
+        <dl className="detail-stats"><div><dt>Sample price</dt><dd>{selected.priceLabel}</dd></div><div><dt>Sample market cap</dt><dd>{selected.marketCapLabel}</dd></div><div><dt>Category</dt><dd>{selected.category}</dd></div><div><dt>Listing</dt><dd>{tagLabel(selected.tag)}</dd></div></dl>
+        <div className="detail-about"><h3>About this listing</h3><p>{selected.description}</p></div>
+        <div className="notice">Listing metrics are illustrative only — no live chain data is connected. Trading is disabled in this preview.</div>
+        <button className="btn" type="button" style={{width:"100%",marginTop:14}} onClick={closeDialog}>Back to catalog</button>
+      </div>}
     </Dialog>
   </>;
 }
