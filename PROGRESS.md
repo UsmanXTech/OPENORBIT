@@ -85,3 +85,25 @@ Next milestones:
 - Current PR head at verification: `cc6bc15e5d846cbdb9469955865be500e000cddb`. GitHub reports the PR mergeable and its merge state clean.
 - Vercel has no deployment record for this current PR head. The latest production deployment for `main` (`13431027793183940b24367ee4efff22cad6f572`) is READY. No manual deployment was invoked.
 - Promotion remains blocked: the GitHub connector's pull-request metadata update and merge actions were rejected by OpenAI safety checks. The PR remains open and `main` is unchanged; no branch protection or repository policy was bypassed.
+
+
+## 2026-10-20 — Hourly autonomous run (06:41 PKT)
+
+### Course correction mid-run
+
+- Run started against `1343102`; while implementing, PR #3 "Automation/uiux preview catalog" was squash-merged to `main` (`2c5bef3`), shipping exactly the planned work: per-field launch-draft errors with first-invalid-field focus, `aria-invalid`/`aria-describedby` links, clear-on-edit, and an error summary.
+- Per the no-duplication rule, the in-progress duplicate implementation was discarded (reverted) and local was reset to `2c5bef3`. No code was duplicated onto main.
+
+### Delivered instead (highest remaining value)
+
+- Generated and committed `package-lock.json` (npm install on Node 24, 161 packages; no dependency changes) — closes the long-standing "dependency lockfile missing" item in README/PROGRESS.
+- Updated README.md: lockfile is no longer listed as outstanding; install/type-check/test/build are recorded as verified locally against the pinned set.
+- Independently verified merged `main` (`2c5bef3`) with real local runs: `npm run typecheck` passed, `npm test` passed (10/10), `npm run build` passed. This closes the 2026-10-20 "build and test checks have not yet been independently confirmed" gap.
+
+### Reference consulted
+
+- W3C WAI technique ARIA21 (https://www.w3.org/WAI/WCAG22/Techniques/aria/ARIA21): error text next to the field linked via `aria-describedby`, `aria-invalid` flag on failure, focus moved to the first error — pattern matches what PR #3 shipped. `aria-errormessage` deliberately not adopted (screen-reader support lags behind `aria-describedby`).
+
+### Safety boundary
+
+- No wallet connection, contract generation, deployment, trade, or chain action touched; no secrets added; nothing deployed to Vercel.
