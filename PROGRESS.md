@@ -21,7 +21,8 @@ Files changed: `src/App.tsx` (detail header markup, two-stat `<dl>`, fineprint),
 
 ### Promotion
 
-- Direct commit to `main` after a fresh fetch; tree clean, no concurrent work, no open PRs, no branch protections bypassed.
+- Direct commit `ad87ad6` pushed to `main` (`67ebc7b..ad87ad6`) after a fresh fetch; tree clean, no concurrent work, no open PRs, no branch protections bypassed.
+- CI run 39385267773 on `ad87ad6`: **success** (typecheck + all tests + build, 26s). Vercel: not touched (read-only; auto-deploys on Vercel's side).
 
 Implemented in this milestone:
 
