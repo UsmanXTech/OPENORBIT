@@ -205,4 +205,37 @@ describe("OPENORBIT marketplace preview",()=>{
   expect(screen.queryByRole("heading",{name:"Connection status"})).not.toBeInTheDocument();
   expect(screen.getByRole("heading",{name:"Explore assets"})).toBeInTheDocument();
  });
+ it("renders the guide as an actionable task list with honest statuses",async()=>{
+  const user=userEvent.setup(); render(<App />);
+  await user.click(screen.getByRole("tab",{name:"Guide"}));
+  const list=screen.getByRole("list");
+  const rows=within(list).getAllByRole("listitem");
+  expect(rows).toHaveLength(4);
+  expect(within(list).getByText("Explore")).toBeInTheDocument();
+  expect(within(list).getByText("Configure")).toBeInTheDocument();
+  expect(within(list).getByText("Validate")).toBeInTheDocument();
+  expect(within(list).getByText("Testnet first")).toBeInTheDocument();
+  // whole-row buttons: status tags are descriptions, not fake links
+  expect(within(list).getAllByRole("button")).toHaveLength(4);
+  expect(within(list).getAllByText("Available")).toHaveLength(3);
+  expect(within(list).getByText("Preview only")).toBeInTheDocument();
+ });
+ it("navigates from a guide step to its view with heading focus",async()=>{
+  const user=userEvent.setup(); render(<App />);
+  await user.click(screen.getByRole("tab",{name:"Guide"}));
+  const list=screen.getByRole("list");
+  await user.click(within(list).getByRole("button",{name:/Configure/}));
+  expect(screen.queryByRole("heading",{name:"From idea to launch draft"})).not.toBeInTheDocument();
+  const heading=screen.getByRole("heading",{name:"Create launch draft"});
+  await waitFor(()=>expect(heading).toHaveFocus());
+ });
+ it("describes each guide step button by its status tag",async()=>{
+  const user=userEvent.setup(); render(<App />);
+  await user.click(screen.getByRole("tab",{name:"Guide"}));
+  const list=screen.getByRole("list");
+  const row=within(list).getByRole("button",{name:/Testnet first/});
+  const describedBy=row.getAttribute("aria-describedby");
+  expect(describedBy).not.toBeNull();
+  expect(document.getElementById(describedBy as string)?.textContent).toBe("Preview only");
+ });
 });

@@ -33,6 +33,22 @@ const sortLabels: Record<SortColumn, string> = {
   cap: "Sample market cap",
 };
 
+// Guide steps: each step is an action row that navigates to the view
+// carrying out the work (GOV.UK task-list pattern — the whole row is the
+// action; status is stated honestly; hint is one short sentence).
+const guideSteps: {
+  name: string;
+  hint: string;
+  target: View;
+  status: string;
+  tone: "muted" | "planned";
+}[] = [
+  { name: "Explore", hint: "Search and compare community projects", target: "explore", status: "Available", tone: "planned" },
+  { name: "Configure", hint: "Draft a token name, supply, and symbol", target: "launch", status: "Available", tone: "planned" },
+  { name: "Validate", hint: "Review inputs before any future deployment", target: "launch", status: "Available", tone: "planned" },
+  { name: "Testnet first", hint: "Chain actions stay disabled pending audit and approval", target: "wallet", status: "Preview only", tone: "muted" },
+];
+
 // Wallet integration states: the demo performs no connection, so the
 // Wallet view reports the honest state of each component (Statuspage
 // pattern) instead of offering fake "connect" buttons.
@@ -921,34 +937,36 @@ export default function App() {
                 finalized.
               </p>
               <ol className="guide-steps">
-                <li>
-                  <span className="step-num">01</span>
-                  <div>
-                    <strong>Explore</strong>
-                    <p>Search and compare community projects.</p>
-                  </div>
-                </li>
-                <li>
-                  <span className="step-num">02</span>
-                  <div>
-                    <strong>Configure</strong>
-                    <p>Draft a token name, supply, and symbol.</p>
-                  </div>
-                </li>
-                <li>
-                  <span className="step-num">03</span>
-                  <div>
-                    <strong>Validate</strong>
-                    <p>Review inputs before any future deployment.</p>
-                  </div>
-                </li>
-                <li>
-                  <span className="step-num">04</span>
-                  <div>
-                    <strong>Testnet first</strong>
-                    <p>Enable chain actions only after audit and approval.</p>
-                  </div>
-                </li>
+                {guideSteps.map((step, i) => {
+                  const statusId = `guide-step-${i + 1}-status`;
+                  return (
+                    <li key={step.name} className="guide-step">
+                      <button
+                        type="button"
+                        className="guide-step-row"
+                        onClick={() => activate(step.target, true)}
+                        aria-describedby={statusId}
+                      >
+                        <span className="guide-step-num" aria-hidden="true">
+                          {String(i + 1).padStart(2, "0")}
+                        </span>
+                        <span className="guide-step-body">
+                          <span className="guide-step-name">{step.name}</span>
+                          <span className="guide-step-hint">{step.hint}</span>
+                        </span>
+                        <span
+                          className={`lozenge lozenge-${step.tone}`}
+                          id={statusId}
+                        >
+                          {step.status}
+                        </span>
+                        <span className="guide-step-go" aria-hidden="true">
+                          →
+                        </span>
+                      </button>
+                    </li>
+                  );
+                })}
               </ol>
               <div className="notice">
                 All displayed market metrics and token listings are illustrative

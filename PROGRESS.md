@@ -1,5 +1,31 @@
 # Engineering progress
 
+## 2026-10-20 — Guide steps become an actionable task list (whole-row navigation)
+
+- Starting state: `main` at `ac113d7` (verified with `git fetch origin` + `git log --oneline -3 origin/main`); working tree clean; no open PRs; latest CI on main green.
+- This hour's highest-value improvement (the "Guide view content-density polish" item from run #13): the Guide view's four static step cards are replaced with an actionable task list — each step is now a full-row button that navigates to the view that does the work (Explore → 01, Launch → 02 and 03, Wallet → 04), with an honest status lozenge alongside each row ("Available" ×3, "Preview only" for the testnet step). The old cards were dead-end decoration restating what the app is; the new list is the Guide's actual job: a "from idea to launch draft" onboarding hub that jumps users to each stage with the target heading focused on arrival. Layout is now a single vertical list everywhere (the 4-col/2-col/1-col grid breakpoints are deleted) — 4 compact rows are strictly shorter than 4 cards, so the 100dvh no-scroll fit improves; `.guide-view` narrows from 860px to 720px for the list measure.
+- Research (mandatory per-component; UI_UX_RESEARCH.md §35–36, fetched directly this run): GOV.UK Design System Task list component — whole row linked (research: users clicked statuses thinking they were links), name + single-sentence hint (no full stop, no links inside), `aria-describedby` from the task link to its status, sentence-case short names, tasks in any order; status-redesign-to-look-less-like-buttons finding NOT needed here since the row itself is the action. Carbon status-indicator pattern (search excerpts; limitation documented) — text label carries the meaning, never color-only. Not transferred: GOV.UK's Completed/Incomplete gating (this is an onboarding hub, not a multi-session service) and its visual tag style (app's `.lozenge` tones reused); Carbon's icon/stop-light vocabulary (no uptime to report). Limitations honestly recorded: Material Design's Steppers page now 404s (M3 retired steppers), the old service-manual task-list URL 404s too — the GOV.UK Design System components page is the page actually opened.
+- Accessibility: rows are real `<button type="button">` elements with the existing `:focus-visible` treatment; `aria-describedby` ties each row to its status (GOV.UK pattern); step numbers are `aria-hidden` decoration with `<ol>` semantics supplying position; the chevron glyph is `aria-hidden`; navigation reuses `activate(target, true)` so focus moves to the target view's heading and the live region announces the switch; hint copy has no trailing period per GOV.UK's hint rule; statuses are never color-only (WCAG 1.4.1).
+
+### Verification (real runs, Node)
+
+- `npm run typecheck`: passed (`tsc --noEmit`, no errors).
+- `npm test`: 39/39 passed twice consecutively (36 existing + 3 new guide tests: task-list renders 4 row buttons with honest statuses; clicking "Configure" navigates to the Launch view with heading focus; each row's `aria-describedby` resolves to its status tag).
+- `npm run build`: passed (production bundle built to `dist/`).
+
+### Files changed
+
+- `src/App.tsx` — `guideSteps` data model (name/hint/target/status/tone); Guide `<ol>` renders full-row buttons wired to `activate(step.target, true)` with `aria-describedby` status ids.
+- `src/styles.css` — `.guide-steps` vertical task-list styles (`.guide-step-row` full-row button, hover, number/body/lozenge/chevron); deleted the 4-col/2-col/1-col grid overrides; `.guide-view` max-width 860px → 720px; density tweaks retargeted at the row.
+- `src/App.test.tsx` — 3 new tests (task-list anatomy + statuses, step navigation with heading focus, status describedby).
+- `UI_UX_RESEARCH.md` — sessions 35–36 (mandatory per-component research) + new honest-limitations bullets (M2 steppers 404, old GOV.UK URL 404, Carbon via excerpts).
+- `PROGRESS.md` — this entry.
+
+### Next
+
+- Verify CI on the promoted commit. Next UX candidate: Launch-view density polish (the last queued item) — the form grid's field spacing/typography, within the no-scroll shell.
+
+
 ## 2026-10-20 — Explore empty-state recovery pass: diagnosis copy + granular recovery actions
 
 - Starting state: `main` at `f73f329` (verified with `git fetch origin` + `git log --oneline -3 origin/main`); working tree had one local-only docs edit (run #12's Promotion fill-in, folded into this run's commit); no open PRs; latest CI on main green.
